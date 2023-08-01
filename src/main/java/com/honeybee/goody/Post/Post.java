@@ -1,28 +1,24 @@
-package com.honeybee.goody.Test;
-
+package com.honeybee.goody.Post;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import java.sql.Timestamp;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
-
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "of")
 @Getter
 @Setter
-public class Test {
+public class Post {
 
-    private String id;
+    private String title;
 
-    private String pw;
+    private String trans_type;
+
+    private int price;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date birth;
-
-
+    private Date postDate;
 }

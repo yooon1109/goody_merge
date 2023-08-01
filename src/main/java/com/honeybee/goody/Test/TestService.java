@@ -28,7 +28,7 @@ public class TestService {
         }else{
             System.out.println("존재하지 않는 유저");
         }
-
+        return user;
 //        FirestoreOptions firestoreOptions = FirestoreOptions.getDefaultInstance();
 //        Firestore firestore = firestoreOptions.getService();
 //        DocumentReference docRef = collectionRef.document("user123"); //
@@ -39,7 +39,7 @@ public class TestService {
 //        if(documentSnapshot.exists()){
 //            user = documentSnapshot.toObject(Test.class);
 //        }
-        return user;
+
     }
 
     public String setUser(Test user) throws ExecutionException, InterruptedException {
