@@ -15,10 +15,12 @@ public class Post {
 
     private String title;
 
-    private String trans_type;
+    private String transType;
 
     private int price;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date postDate;
+
+    private String category;
 }
