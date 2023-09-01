@@ -11,8 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor(staticName = "of")
 @Getter
 @Setter
-public class Post {//게시글 컨텐츠와 관련된 모든 데이터들
-
+public class PreviewDTO {//게시글 미리보기(썸네일)에 필요한 데이터들만
     private String title;
 
     private String transType;

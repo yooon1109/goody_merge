@@ -14,11 +14,16 @@ import org.springframework.stereotype.Service;
 public class TestService {
 
     Test user;
-    Firestore dbFirestore = FirestoreClient.getFirestore();// Firestore 초기화
+    private final Firestore firestore;
+
+    public TestService(Firestore firestore) {
+        this.firestore = firestore;
+    }
+
     public Test getUser(String collection, String id) throws ExecutionException, InterruptedException {
 
         //컬렉션참조
-        CollectionReference collectionRef = dbFirestore.collection(collection);
+        CollectionReference collectionRef = firestore.collection(collection);
         // "id" 필드가 id인 문서를 쿼리하여 가져오기
         ApiFuture<QuerySnapshot> querySnapshotFuture = collectionRef.whereEqualTo("id", id).get();
         QuerySnapshot querySnapshot = querySnapshotFuture.get();
@@ -44,7 +49,7 @@ public class TestService {
 
     public String setUser(Test user) throws ExecutionException, InterruptedException {
         //컬렉션참조
-        CollectionReference collectionRef = dbFirestore.collection("USER");
+        CollectionReference collectionRef =firestore.collection("USER");
         ApiFuture<DocumentReference> result = collectionRef.add(user);
         return user.getId()+"성공";
     }

@@ -16,17 +16,17 @@ public class PostController {
 
     private final PostService postService;
 
-    @Operation(summary = "판매해요 게시글", description = "")
+    @Operation(summary = "판매해요 게시글", description = "판매해요 게시글 미리보기")
     @GetMapping("/sell")
-    public ResponseEntity<List<Post>> sellPost() throws ExecutionException, InterruptedException {
-       List<Post> sellposts =  postService.getPreviewPosts("판매해요");
+    public ResponseEntity<List<PreviewDTO>> sellPost() throws ExecutionException, InterruptedException {
+       List<PreviewDTO> sellposts =  postService.getPreviewPosts("판매해요");
        return ResponseEntity.ok(sellposts);
     }
 
-    @Operation(summary = "구해요 게시글", description = "")
+    @Operation(summary = "구해요 게시글", description = "구해요 게시글 미리보기")
     @GetMapping("/need")
-    public ResponseEntity<List<Post>> needPost() throws ExecutionException, InterruptedException {
-        List<Post> needPosts =  postService.getPreviewPosts("구해요");
+    public ResponseEntity<List<PreviewDTO>> needPost() throws ExecutionException, InterruptedException {
+        List<PreviewDTO> needPosts =  postService.getPreviewPosts("구해요");
         return ResponseEntity.ok(needPosts);
     }
     
