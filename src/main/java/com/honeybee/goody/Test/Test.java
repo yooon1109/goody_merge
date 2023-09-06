@@ -2,7 +2,6 @@ package com.honeybee.goody.Test;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import java.sql.Timestamp;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
