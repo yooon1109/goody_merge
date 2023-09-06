@@ -26,14 +26,7 @@ public class FileController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
-        // String fileExtension = file.substring(file.lastIndexOf('.')).toLowerCase();//확장자 추출
-        // if(fileExtension.equals(".jpg")||fileExtension.equals(".jpeg")){
-        //     headers.setContentType(MediaType.IMAGE_JPEG);//확장자에 맞춰 헤더 세팅
-        // }else if(fileExtension.equals(".png")){
-        //     headers.setContentType(MediaType.IMAGE_PNG);
-        // }else{
-        //     throw new IOException("noooo error");
-        // }
+
         //headers.setContentDisposition(ContentDisposition.builder("attachment").filename(fileName).build());//파일 다운로드
         return ResponseEntity.ok()
             .headers(headers)
