@@ -1,7 +1,12 @@
 package com.honeybee.goody.File;
 
+import com.google.cloud.firestore.annotation.DocumentId;
+import com.honeybee.goody.Post.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class FileController {
     private final FileService fileService;
+    private final PostService postService;
     @Operation(summary = "파일 불러오기", description = "해당하는 이름의 파일.")
     @GetMapping("/files/")
     public ResponseEntity<byte[]> getFile(@RequestParam String file) throws IOException {
@@ -39,5 +45,21 @@ public class FileController {
     public ResponseEntity<String> uploadFile(@RequestPart MultipartFile multipartFile) throws IOException {
         String filePath = fileService.fileUpload(multipartFile);
         return ResponseEntity.ok(filePath);
+    }
+
+    @Operation(summary = "파일 업로드v2", description = "해당 게시글의 파일명과 파일경로(여러장의 파일)")
+    @PostMapping(value = "/fileList",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<List<String>> uploadFileList(@RequestPart MultipartFile[] multipartFile,@RequestParam
+        String documentId) throws ExecutionException, InterruptedException {
+        List<String> filePathList = Arrays.stream(multipartFile).map(file-> {
+            try {
+                return fileService.fileUpload(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).toList();
+        postService.setPostFilePath(filePathList,documentId);
+
+        return ResponseEntity.ok(filePathList);
     }
 }
