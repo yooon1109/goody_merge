@@ -1,14 +1,9 @@
 package com.honeybee.goody.Collection;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Date;
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "of")

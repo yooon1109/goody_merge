@@ -25,8 +25,8 @@ public class CollectionDetailDTO {
 
     //컬렉션 작성 날짜
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date uploadDate;
+    private Date createdDate;
 
     // 컬렉션 사진 리스트
-    private List<String> imgPath;
+    private List<String> images;
 }
