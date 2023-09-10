@@ -13,7 +13,10 @@ import java.util.List;
 @AllArgsConstructor(staticName = "of")
 @Getter
 @Setter
-public class Collection {
+public class CollectionDetailDTO {
+    // 컬렉션 아이디
+    private String collectionId;
+
     //컬렉션 제목
     private String title;
 
@@ -22,8 +25,8 @@ public class Collection {
 
     //컬렉션 작성 날짜
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date date;
+    private Date createdDate;
 
-    //컬렉션 사진
-    private List<String> filePath;
+    // 컬렉션 사진 리스트
+    private List<String> images;
 }
