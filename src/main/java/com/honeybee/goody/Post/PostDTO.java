@@ -12,18 +12,25 @@ import lombok.Setter;
 @AllArgsConstructor(staticName = "of")
 @Getter
 @Setter
-public class Post {//게시글 컨텐츠와 관련된 모든 데이터들
+public class PostDTO {
 
-    private String title;
-
-    private String transType;
-
-    private int price;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date postDate;
-
+    //카테고리
     private String category;
-
+    //상품 거래종류
+    private String transType;
+    //상품 등급
+    private String grade;
+    //게시글 제목
+    private String title;
+    //상품가격
+    private int price;
+    //나눔인지 아닌지
+    private boolean free;
+    //상품 설명
+    private String explain;
+    //게시글 등록 날짜
+    private Date postDate;
+    //파일경로
     private List<String> filePath;
+
 }

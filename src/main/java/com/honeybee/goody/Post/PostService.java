@@ -2,9 +2,12 @@ package com.honeybee.goody.Post;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.WriteResult;
+import com.google.cloud.firestore.annotation.DocumentId;
 import com.google.firebase.cloud.FirestoreClient;
 
 import java.util.HashMap;
@@ -28,8 +31,7 @@ public class PostService {
 
     public Map<String,Object> getPreviewPosts(String type,int page) throws ExecutionException, InterruptedException {
         //컬렉션참조
-        CollectionReference collectionRef = firestore.collection("POST");
-        // "createdAt" 필드를 기준으로 내림차순 정렬
+        CollectionReference collectionRef = firestore.collection("POST");//필드를 기준으로 내림차순 정렬
         Query query = collectionRef.orderBy("postDate", Query.Direction.ASCENDING);
         int pageSize = 5; // 페이지 크기
 
@@ -57,4 +59,24 @@ public class PostService {
         return postInfo;
     }
 
+    public String setPost(PostDTO postDTO) throws ExecutionException, InterruptedException{
+
+        //컬렉션참조
+        CollectionReference collectionRef =firestore.collection("POST");
+        ApiFuture<DocumentReference> result = collectionRef.add(postDTO);
+        return result.get().getId();
+    }
+
+    public String setPostFilePath(List<String> filePathList, String documentId)
+        throws ExecutionException, InterruptedException {
+        CollectionReference collectionRef =firestore.collection("POST");
+        // 업데이트할 데이터 생성
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("files", filePathList);
+
+        DocumentReference documentRef = collectionRef.document(documentId);
+        ApiFuture<WriteResult> writeResult = documentRef.update("filePath",updates);
+        writeResult.get(); // 업데이트 작업 완료 대기
+        return "ok";
+    }
 }

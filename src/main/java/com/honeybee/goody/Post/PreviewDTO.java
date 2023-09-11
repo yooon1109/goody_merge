@@ -2,6 +2,7 @@ package com.honeybee.goody.Post;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +14,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PreviewDTO {//게시글 미리보기(썸네일)에 필요한 데이터들만
+
+    private String documentId;
+
     private String title;
 
     private String transType;
@@ -26,5 +30,4 @@ public class PreviewDTO {//게시글 미리보기(썸네일)에 필요한 데이
 
     private Map<String,Object> filePath;
 
-    private String documentId;
 }
