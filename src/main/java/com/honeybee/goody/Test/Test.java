@@ -16,9 +16,9 @@ import lombok.Setter;
 @Setter
 public class Test {
 
-    private String id;
+    private String userId;
 
-    private String pw;
+    private String userPw;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date birth;

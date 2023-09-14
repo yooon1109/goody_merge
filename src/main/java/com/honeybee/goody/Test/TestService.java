@@ -51,6 +51,6 @@ public class TestService {
         //컬렉션참조
         CollectionReference collectionRef =firestore.collection("USER");
         ApiFuture<DocumentReference> result = collectionRef.add(user);
-        return user.getId()+"성공";
+        return user.getUserId()+"성공";
     }
 }

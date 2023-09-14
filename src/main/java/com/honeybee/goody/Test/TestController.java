@@ -40,7 +40,7 @@ public class TestController {
         }
 
         if (user != null) {
-            return ResponseEntity.ok(user.getId()+"있음");
+            return ResponseEntity.ok(user.getUserId()+"있음");
         } else {
             return ResponseEntity.ok("존재하지않는유저");
         }
