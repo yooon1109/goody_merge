@@ -35,7 +35,8 @@ public class UserService implements UserDetailsService {
                         .builder()
                         .username(user.getUserId())
                         .password(user.getUserPw())
-                        .build();
+//                        .authorities()//권한부여
+                        .build();//유저 정보
             } else {
                 System.out.println("존재하지 않는 유저");
                 return null;
@@ -45,15 +46,15 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public UserDetails loginUserInfo() throws ExecutionException, InterruptedException {
-        UserDetails customUser = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    //현재 로그인 한 사람의 정보를 통해 그 유저의 documentId값을 찾아오기
+    public String  loginUserDocumentId() throws ExecutionException, InterruptedException {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         CollectionReference collectionRef = this.firestore.collection("Users");
-        ApiFuture<QuerySnapshot> querySnapshotFuture = collectionRef.whereEqualTo("userId", customUser.getUsername()).get();
+        ApiFuture<QuerySnapshot> querySnapshotFuture = collectionRef.whereEqualTo("userId", userDetails.getUsername()).get();
         QuerySnapshot querySnapshot = (QuerySnapshot)querySnapshotFuture.get();
         if (!querySnapshot.isEmpty()) {
             DocumentSnapshot documentSnapshot = (DocumentSnapshot) querySnapshot.getDocuments().get(0);
-           // customUser.setUserDocumentId(documentSnapshot.getId());
-            return customUser;
+            return documentSnapshot.getId();
         }else {
             System.out.println("존재하지 않는 유저");
             return null;

@@ -1,10 +1,8 @@
 package com.honeybee.goody.Config;
 
-import com.honeybee.goody.User.CustomUser;
 import com.honeybee.goody.User.UserService;
 import jakarta.servlet.DispatcherType;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
@@ -12,9 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
-import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -52,15 +47,14 @@ public class SecurityConfig {
                     //    .defaultSuccessUrl("/docs")
                         .successHandler((request, response, authentication) -> {
                             response.setStatus(HttpServletResponse.SC_OK); // 200 OK
-
-                            response.sendRedirect("/docs");
+                            response.sendRedirect("/goody/docs");
+//                            System.out.println(passwordEncoder().encode("qwe123"));//암호화한 비밀번호 알아내기
                         })
                         .failureHandler((request, response, exception) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized
                         })
                         )
                 .logout(Customizer.withDefaults());
-    System.out.println();
         return http.build();
     }
 

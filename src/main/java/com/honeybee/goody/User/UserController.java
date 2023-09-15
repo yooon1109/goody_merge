@@ -18,8 +18,9 @@ public class UserController {
     @GetMapping("/get")
     public ResponseEntity<String> userLogin() throws ExecutionException, InterruptedException {
 
-        //UserRecord user = authenticationService.verifyUser(userId,password);
-        UserDetails customUser = userService.loginUserInfo();
-        return ResponseEntity.ok(customUser.getUsername());
+        //UserRecord user = authenticationService.verifyUser(userId,password);//firebase auth로 정보 가져오기
+        String userDocumentId = userService.loginUserDocumentId();
+
+        return ResponseEntity.ok(userDocumentId);
     }
 }
