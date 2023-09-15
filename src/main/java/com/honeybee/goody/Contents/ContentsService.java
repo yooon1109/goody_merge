@@ -57,26 +57,29 @@ public class ContentsService {
     }
 
     //컨텐츠 검색
-    public List<PreviewDTO> SearchPreviewContents(String search,String category,String transType, boolean sold) throws ExecutionException, InterruptedException {
+    public List<PreviewDTO> SearchPreviewContents(String search,String category,String transType, Boolean sold) throws ExecutionException, InterruptedException {
         CollectionReference collectionRef = firestore.collection("Contents");
 
         Query query = collectionRef;
         if(search!=null){
             // 'title' 필드 또는 'explain' 필드에서 검색 후 정렬
             query = query
-                    .whereLessThanOrEqualTo("title",search);
+                    .whereEqualTo("title",search);
                    // .whereGreaterThanOrEqualTo("title", search);
-                  //  .startAt(query.whereArrayContains("explain",search).get().get().getDocuments());
+
         }
         if(category!=null){
             query = query
                     .whereEqualTo("category",category);
         }
-        if(category!=null){
+        if(transType!=null){
             query = query
                     .whereEqualTo("transType",transType);
         }
-
+        if(sold!=null){
+            query = query
+                    .whereEqualTo("sold",sold);
+        }
         ApiFuture<QuerySnapshot> querySnapshot = query.get();
         List<PreviewDTO> contents = querySnapshot.get().getDocuments().stream()
                 .map(document->{
