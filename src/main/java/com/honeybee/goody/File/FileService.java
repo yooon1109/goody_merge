@@ -16,14 +16,14 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FileService {
 
-    private final Firestore firestore;
-    private final Storage storage;
-
-    @Autowired
-    public FileService(Firestore firestore, Storage storage) {
-        this.firestore = firestore;
-        this.storage = storage;
-    }
+//    private final Firestore firestore;
+//    private final Storage storage;
+//
+//    @Autowired
+//    public FileService(Firestore firestore, Storage storage) {
+//        this.firestore = firestore;
+//        this.storage = storage;
+//    }
 
     public String fileUpload(MultipartFile multipartFile)
         throws IOException {
