@@ -1,18 +1,11 @@
 package com.honeybee.goody.Contents;
 
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.Query;
-import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -36,8 +29,6 @@ public class ContentsService {
     //컨텐츠 미리보기
     public Map<String,Object> getPreviewContents(String type,int page) throws ExecutionException, InterruptedException {
         //컬렉션참조
-        //TODO : Post -> Contents로 수정
-        //TODO : postDate -> createdDate
         CollectionReference collectionRef = firestore.collection("Contents");//필드를 기준으로 내림차순 정렬
         Query query = collectionRef.orderBy("createdDate", Query.Direction.ASCENDING);
         int pageSize = 5; // 페이지 크기
@@ -60,18 +51,47 @@ public class ContentsService {
         }
         Map<String, Object> postInfo = new HashMap<>();
         postInfo.put("postPreviewInfo",posts);//post리스트
-
-
         postInfo.put("hasNext",hasNext);
+
         return postInfo;
     }
 
-    public Map<String,Object> getPreviewContents(String search,int category,int transType, boolean sold){
+    //컨텐츠 검색
+    public List<PreviewDTO> SearchPreviewContents(String search,String category,String transType, boolean sold) throws ExecutionException, InterruptedException {
         CollectionReference collectionRef = firestore.collection("Contents");
-        Query query = collectionRef.orderBy("createdDate", Query.Direction.ASCENDING);//필드를 기준으로 내림차순 정렬
-        int pageSize = 12; // 페이지 크기
 
-        return null;
+        Query query = collectionRef;
+        if(search!=null){
+            // 'title' 필드 또는 'explain' 필드에서 검색 후 정렬
+            query = query
+                    .whereLessThanOrEqualTo("title",search);
+                   // .whereGreaterThanOrEqualTo("title", search);
+                  //  .startAt(query.whereArrayContains("explain",search).get().get().getDocuments());
+        }
+        if(category!=null){
+            query = query
+                    .whereEqualTo("category",category);
+        }
+        if(category!=null){
+            query = query
+                    .whereEqualTo("transType",transType);
+        }
+
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        List<PreviewDTO> contents = querySnapshot.get().getDocuments().stream()
+                .map(document->{
+                    PreviewDTO previewDTO = document.toObject(PreviewDTO.class);
+                    previewDTO.setDocumentId(document.getId());
+                    return previewDTO;
+                }).toList();
+
+//        // 중복 결과 제거를 위한 Set 사용
+//        Set<Map<String, Object>> resultSet = new HashSet<>(results);
+//
+//        // 중복이 제거된 결과를 다시 리스트로 변환
+//        List<Map<String, Object>> uniqueResults = new ArrayList<>(resultSet);
+        return contents;
+        //총개수
     }
 
     //컨텐츠 등록
@@ -119,4 +139,6 @@ public class ContentsService {
 
         ).toList();
     }
+
+    //페이지 그 그거 암튼 추후에 수정 중복되는 코드 수정
 }
