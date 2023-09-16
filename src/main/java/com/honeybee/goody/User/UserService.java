@@ -35,6 +35,7 @@ public class UserService implements UserDetailsService {
                         .builder()
                         .username(user.getUserId())
                         .password(user.getUserPw())
+
 //                        .authorities()//권한부여
                         .build();//유저 정보
             } else {

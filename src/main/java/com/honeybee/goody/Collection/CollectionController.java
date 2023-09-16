@@ -1,5 +1,6 @@
 package com.honeybee.goody.Collection;
 
+import com.honeybee.goody.User.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 
@@ -18,15 +19,14 @@ public class CollectionController {
 
     @Operation(summary = "컬렉션 상세페이지", description = "유저의 컬렉션 상세페이지")
     @GetMapping("/detail")
-    public Map<String, Object> getCollectionDetail(@Parameter(description = "유저 아이디") @RequestParam String userId, @Parameter(description = "컬렉션 번호") @RequestParam String collectionId) throws Exception {
-
-            return collectionService.getCollectionDetail(userId, collectionId);
+    public Map<String, Object> getCollectionDetail(@Parameter(description = "컬렉션 번호") @RequestParam String collectionId) throws Exception {
+        return collectionService.getCollectionDetail(collectionId);
     }
 
     @Operation(summary = "컬렉션 목록페이지", description = "유저의 컬렉션 목록페이지")
     @GetMapping("/list")
-    public Map<String, Object> getCollectionList(@Parameter(description = "유저 아이디") @RequestParam String userId) throws Exception {
-        return collectionService.getCollectionList(userId);
+    public Map<String, Object> getCollectionList() throws Exception {
+        return collectionService.getCollectionList();
     }
 
     @Operation(summary = "컬렉션 글쓰기", description = "유저의 컬렉션 글쓰기페이지")

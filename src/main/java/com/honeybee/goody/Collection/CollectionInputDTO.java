@@ -13,7 +13,6 @@ import java.util.List;
 @Getter
 @Setter
 public class CollectionInputDTO {
-    private String userId;
     private String title;
     private String content;
     private List<MultipartFile> images;
