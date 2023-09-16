@@ -41,27 +41,19 @@ public class CollectionService {
 
     public Map<String,Object> getCollectionDetail(String collectionId) throws Exception {
         String userDocumentId = userService.loginUserDocumentId();
-        DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+        CollectionReference myCollectionRef = firestore.collection("Users").document(userDocumentId).collection("myCollection");
+        DocumentSnapshot documentSnapshot = myCollectionRef.whereEqualTo("collectionId", collectionId).get().get().getDocuments().get(0);
 
-        CollectionReference myCollectionRef = userDocRef.collection("myCollection");
+        if (documentSnapshot.exists()) {
+            Map<String, Object> data = documentSnapshot.getData();
 
-        Query collectionQuery = myCollectionRef.whereEqualTo("collectionId", collectionId);
-        QuerySnapshot collectionQuerySnapshot = collectionQuery.get().get();
-
-        DocumentSnapshot targetDoc = null;
-        if (!collectionQuerySnapshot.isEmpty()) {
-            targetDoc = collectionQuerySnapshot.getDocuments().get(0);
-        }
-
-        if (targetDoc != null && targetDoc.exists()) {
-            Map<String, Object> data = targetDoc.getData();
-            CollectionDetailDTO collectionDTO = targetDoc.toObject(CollectionDetailDTO.class);
+            CollectionDetailDTO collectionDTO = documentSnapshot.toObject(CollectionDetailDTO.class);
             collectionDTO.setCollectionId((String) data.get("collectionId"));
             collectionDTO.setContent((String) data.get("content"));
             collectionDTO.setTitle((String) data.get("title"));
             collectionDTO.setImages((List<String>) data.get("images"));
 
-            com.google.cloud.Timestamp firestoreTimestamp = (com.google.cloud.Timestamp) targetDoc.get("createdDate");
+            com.google.cloud.Timestamp firestoreTimestamp = (com.google.cloud.Timestamp) documentSnapshot.get("createdDate");
             java.util.Date createdDate = firestoreTimestamp.toDate();
             collectionDTO.setCreatedDate(createdDate);
 
@@ -90,9 +82,7 @@ public class CollectionService {
     public Map<String,Object> getCollectionList() throws Exception {
         String userDocumentId = userService.loginUserDocumentId();
         DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
-        CollectionReference myCollectionRef = userDocRef.collection("myCollection");
-        ApiFuture<QuerySnapshot> querySnapshot = myCollectionRef.get();
-        List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
+        List<QueryDocumentSnapshot> documents = userDocRef.collection("myCollection").orderBy("createdDate", Query.Direction.DESCENDING).get().get().getDocuments();
 
         List<CollectionListDTO> dtoList = documents.stream().map(document -> {
             Map<String, Object> data = document.getData();
@@ -119,21 +109,17 @@ public class CollectionService {
 
     public ResponseEntity<String> createCollection(CollectionInputDTO inputData) throws Exception {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        CollectionReference collectionRef = this.firestore.collection("Users");
-        ApiFuture<QuerySnapshot> future = collectionRef.whereEqualTo("userId", userDetails.getUsername()).get();
-        QuerySnapshot querySnapshot = future.get();
+        CollectionReference myCollectionRef = this.firestore.collection("Users")
+                .whereEqualTo("userId", userDetails.getUsername())
+                .get()
+                .get()
+                .getDocuments()
+                .get(0)
+                .getReference()
+                .collection("myCollection");
 
-        DocumentSnapshot userDoc = querySnapshot.getDocuments().get(0);
-        CollectionReference myCollectionRef = userDoc.getReference().collection("myCollection");
-
-        ApiFuture<QuerySnapshot> collectionFuture = myCollectionRef.get();
-        QuerySnapshot collectionSnapshot = collectionFuture.get();
-        int currentCollectionCount = collectionSnapshot.size();
-
-        int newCollectionCount = currentCollectionCount + 1;
-
+        int newCollectionCount = myCollectionRef.get().get().size() + 1;
         String newCollectionId = userDetails.getUsername() + "-" + newCollectionCount;
-
         List<String> imageUrls = saveImagesToStorage(newCollectionId, inputData.getImages());
 
         Map<String, Object> data = new HashMap<>();

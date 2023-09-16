@@ -14,7 +14,6 @@ public class CollectionListDTO {
     // 썸네일 이미지
     private String thumbnail;
 
-
     // 컬렉션 아이디
     private String collectionId;
 }
