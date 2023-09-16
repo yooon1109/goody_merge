@@ -5,18 +5,25 @@ import com.google.cloud.firestore.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 import com.google.cloud.storage.*;
 import com.google.cloud.storage.Blob;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.cloud.StorageClient;
+import com.honeybee.goody.Contents.PreviewDTO;
+import com.honeybee.goody.User.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,36 +31,29 @@ import org.springframework.web.multipart.MultipartFile;
 public class CollectionService {
 
     private final Firestore firestore;
+    private final UserService userService;
+
     @Autowired
-    public CollectionService(Firestore firestore) {
+    public CollectionService(Firestore firestore, UserService userService) throws ExecutionException, InterruptedException {
         this.firestore = firestore;
+        this.userService = userService;
     }
 
-    public Map<String,Object> getCollectionDetail(String userId, String collectionId) throws Exception {
-        Query userQuery = firestore.collection("Users").whereEqualTo("userId", userId);
-        QuerySnapshot querySnapshot = userQuery.limit(1).get().get();
+    public Map<String,Object> getCollectionDetail(String collectionId) throws Exception {
+        String userDocumentId = userService.loginUserDocumentId();
+        CollectionReference myCollectionRef = firestore.collection("Users").document(userDocumentId).collection("myCollection");
+        DocumentSnapshot documentSnapshot = myCollectionRef.whereEqualTo("collectionId", collectionId).get().get().getDocuments().get(0);
 
-        DocumentSnapshot userDoc = querySnapshot.getDocuments().get(0);
+        if (documentSnapshot.exists()) {
+            Map<String, Object> data = documentSnapshot.getData();
 
-        CollectionReference myCollectionRef  = userDoc.getReference().collection("myCollection");
-
-        Query collectionQuery = myCollectionRef.whereEqualTo("collectionId", collectionId);
-        QuerySnapshot collectionQuerySnapshot = collectionQuery.get().get();
-
-        DocumentSnapshot targetDoc = null;
-        if (!collectionQuerySnapshot.isEmpty()) {
-            targetDoc = collectionQuerySnapshot.getDocuments().get(0);
-        }
-
-        if (targetDoc != null && targetDoc.exists()) {
-            Map<String, Object> data = targetDoc.getData();
-            CollectionDetailDTO collectionDTO = targetDoc.toObject(CollectionDetailDTO.class);
+            CollectionDetailDTO collectionDTO = documentSnapshot.toObject(CollectionDetailDTO.class);
             collectionDTO.setCollectionId((String) data.get("collectionId"));
             collectionDTO.setContent((String) data.get("content"));
             collectionDTO.setTitle((String) data.get("title"));
             collectionDTO.setImages((List<String>) data.get("images"));
 
-            com.google.cloud.Timestamp firestoreTimestamp = (com.google.cloud.Timestamp) targetDoc.get("createdDate");
+            com.google.cloud.Timestamp firestoreTimestamp = (com.google.cloud.Timestamp) documentSnapshot.get("createdDate");
             java.util.Date createdDate = firestoreTimestamp.toDate();
             collectionDTO.setCreatedDate(createdDate);
 
@@ -62,7 +62,16 @@ public class CollectionService {
             responseData.put("content", collectionDTO.getContent());
             responseData.put("title", collectionDTO.getTitle());
             responseData.put("createdDate", collectionDTO.getCreatedDate());
-            responseData.put("images", collectionDTO.getImages());
+            List<String> images = collectionDTO.getImages().stream().map(image -> {
+                try {
+                    String encodedURL = URLEncoder.encode(image, "UTF-8");
+                    return "https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+ encodedURL + "?alt=media&token=";
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                }
+            }).toList();
+
+            responseData.put("images", images);
 
             return responseData;
         } else {
@@ -70,27 +79,28 @@ public class CollectionService {
         }
     }
 
-    public Map<String,Object> getCollectionList(String userId) throws Exception {
-        Query userQuery = firestore.collection("Users").whereEqualTo("userId", userId);
-        QuerySnapshot userQuerySnapshot = userQuery.limit(1).get().get();
+    public Map<String,Object> getCollectionList() throws Exception {
+        String userDocumentId = userService.loginUserDocumentId();
+        DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+        List<QueryDocumentSnapshot> documents = userDocRef.collection("myCollection").orderBy("createdDate", Query.Direction.DESCENDING).get().get().getDocuments();
 
-        DocumentSnapshot userDoc = userQuerySnapshot.getDocuments().get(0);
+        List<CollectionListDTO> dtoList = documents.stream().map(document -> {
+            Map<String, Object> data = document.getData();
+            CollectionListDTO dto = document.toObject(CollectionListDTO.class);
 
-        CollectionReference myCollectionRef  = userDoc.getReference().collection("myCollection");
+            dto.setCollectionId(data.get("collectionId").toString());
+            List<String> images = (List<String>) data.get("images");
+            String thumbnail = images.get(0).toString();
 
-        ApiFuture<QuerySnapshot> querySnapshot = myCollectionRef.get();
-
-        List<QueryDocumentSnapshot> documents = querySnapshot.get().getDocuments();
-        List<CollectionListDTO> dtoList = new ArrayList<>();
-
-        for (QueryDocumentSnapshot document : documents) {
-            if (document.exists()) {
-                CollectionListDTO dto = new CollectionListDTO();
-                dto.setCollectionId(document.getString("collectionId"));
-                dto.setThumbnailPath(document.getString("thumbnailPath"));
-                dtoList.add(dto);
+            try {
+                String encodedURL = URLEncoder.encode(thumbnail, "UTF-8");
+                dto.setThumbnail("https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+ encodedURL + "?alt=media&token=");
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
             }
-        }
+
+            return dto;
+        }).toList();
 
         Map<String, Object> response = new HashMap<>();
         response.put("data", dtoList);
@@ -98,24 +108,18 @@ public class CollectionService {
     }
 
     public ResponseEntity<String> createCollection(CollectionInputDTO inputData) throws Exception {
-        Query userQuery = firestore.collection("Users").whereEqualTo("userId", inputData.getUserId());
-        QuerySnapshot userQuerySnapshot = userQuery.limit(1).get().get();
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        CollectionReference myCollectionRef = this.firestore.collection("Users")
+                .whereEqualTo("userId", userDetails.getUsername())
+                .get()
+                .get()
+                .getDocuments()
+                .get(0)
+                .getReference()
+                .collection("myCollection");
 
-        DocumentSnapshot userDoc = userQuerySnapshot.getDocuments().get(0);
-
-        CollectionReference myCollectionRef = userDoc.getReference().collection("myCollection");
-
-        ApiFuture<QuerySnapshot> future = myCollectionRef.get();
-        QuerySnapshot allCollectionsSnapshot = future.get();
-        int collectionCount = allCollectionsSnapshot.size();
-        int newCollectionCount = collectionCount + 1;
-
-        String newCollectionId = inputData.getUserId() + "-" + newCollectionCount;
-
-        if (userQuerySnapshot.isEmpty()) {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-        }
-
+        int newCollectionCount = myCollectionRef.get().get().size() + 1;
+        String newCollectionId = userDetails.getUsername() + "-" + newCollectionCount;
         List<String> imageUrls = saveImagesToStorage(newCollectionId, inputData.getImages());
 
         Map<String, Object> data = new HashMap<>();
