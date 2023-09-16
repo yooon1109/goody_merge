@@ -1,8 +1,11 @@
-package com.honeybee.goody.Post;
+package com.honeybee.goody.Contents;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+
+
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +15,9 @@ import lombok.Setter;
 @AllArgsConstructor(staticName = "of")
 @Getter
 @Setter
-public class Post {//게시글 컨텐츠와 관련된 모든 데이터들
+public class PreviewDTO {//게시글 미리보기(썸네일)에 필요한 데이터들만
+
+    private String documentId;
 
     private String title;
 
@@ -21,9 +26,10 @@ public class Post {//게시글 컨텐츠와 관련된 모든 데이터들
     private int price;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date postDate;
+    private Date createdDate;
 
     private String category;
 
     private List<String> filePath;
+
 }

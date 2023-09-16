@@ -1,23 +1,27 @@
-package com.honeybee.goody.Post;
+package com.honeybee.goody.Contents;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "of")
 @Getter
 @Setter
-public class PostDTO {
+public class ContentsDTO {//프론트에서 받아올 데이터들
 
     //카테고리
     private String category;
     //상품 거래종류
     private String transType;
+    //같이해요일 경우(인원수)
+    private Integer numOfPeople;
+    //같이해요일 경우(추가 인원)
+    private List<String> people;
     //상품 등급
     private String grade;
     //게시글 제목
@@ -28,9 +32,7 @@ public class PostDTO {
     private boolean free;
     //상품 설명
     private String explain;
-    //게시글 등록 날짜
-    private Date postDate;
-    //파일경로
-    private List<String> filePath;
+    //파일
+    private List<MultipartFile> multipartFiles;
 
 }
