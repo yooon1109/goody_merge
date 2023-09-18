@@ -4,6 +4,8 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -40,6 +42,13 @@ public class ContentsService {
             .map(doc -> {
                 PreviewDTO previewDTO = doc.toObject(PreviewDTO.class);
                 previewDTO.setDocumentId(doc.getId()); // 문서의 ID를 설정
+                try {
+                    String encodedURL = URLEncoder.encode(previewDTO.getThumbnailImg(), "UTF-8");
+                    previewDTO.setThumbnailImg("https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+encodedURL + "?alt=media&token=");
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                }
+
                 return previewDTO;
             })
             .collect(Collectors.toList());
@@ -62,7 +71,7 @@ public class ContentsService {
 
         Query query = collectionRef;
         if(search!=null){
-            // 'title' 필드 또는 'explain' 필드에서 검색 후 정렬
+            // 'title' 필드 또는 'explain' 필드에서 검색 후 정렬->title 완전 일치만 검색 가능
             query = query
                     .whereEqualTo("title",search);
                    // .whereGreaterThanOrEqualTo("title", search);
@@ -87,14 +96,10 @@ public class ContentsService {
                     previewDTO.setDocumentId(document.getId());
                     return previewDTO;
                 }).toList();
+        //총개수..?
 
-//        // 중복 결과 제거를 위한 Set 사용
-//        Set<Map<String, Object>> resultSet = new HashSet<>(results);
-//
-//        // 중복이 제거된 결과를 다시 리스트로 변환
-//        List<Map<String, Object>> uniqueResults = new ArrayList<>(resultSet);
         return contents;
-        //총개수
+
     }
 
     //컨텐츠 등록
@@ -102,7 +107,7 @@ public class ContentsService {
 
         ModelMapper modelMapper = new ModelMapper();
         Contents contents = modelMapper.map(contentsDTO, Contents.class);//받은 데이터 매핑
-        contents.setFilePath(setContentsFilePath(contentsDTO.getMultipartFiles()));//파일 경로 저장
+        contents.setImgPath(setContentsFilePath(contentsDTO.getImgPath()));//파일 경로 저장
         LocalDateTime localDateTime = LocalDateTime.now();
         // LocalDateTime을 Instant로 변환
         java.time.Instant instant = localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant();

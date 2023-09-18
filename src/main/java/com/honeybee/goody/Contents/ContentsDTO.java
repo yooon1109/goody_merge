@@ -33,6 +33,6 @@ public class ContentsDTO {//프론트에서 받아올 데이터들
     //상품 설명
     private String explain;
     //파일
-    private List<MultipartFile> multipartFiles;
+    private List<MultipartFile> imgPath;
 
 }

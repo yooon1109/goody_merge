@@ -36,7 +36,9 @@ public class Contents {//게시글 컨텐츠 등록할 데이터들
     //상품 설명
     private String explain;
     //파일 경로
-    private List<String> filePath;
+    private List<String> imgPath;
+    //
+    private String thumbnailImg;
     //품절여부
     private boolean sold;
 
