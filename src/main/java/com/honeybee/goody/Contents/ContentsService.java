@@ -3,10 +3,12 @@ package com.honeybee.goody.Contents;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.honeybee.goody.File.FileService;
+import com.honeybee.goody.User.UserService;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -26,11 +28,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class ContentsService {
     private final Firestore firestore;
     private final FileService fileService;
+    private final UserService userService;
 
     @Autowired
-    public ContentsService(Firestore firestore, FileService fileService) {
+    public ContentsService(Firestore firestore, FileService fileService, UserService userService) {
         this.firestore = firestore;
         this.fileService = fileService;
+        this.userService = userService;
     }
 
     //컨텐츠 미리보기
@@ -107,18 +111,43 @@ public class ContentsService {
 
     }
 
+    //컨텐츠 상세 정보
+    public ContentsDetailDTO getContentsDetail(String documentId)
+        throws ExecutionException, InterruptedException {
+        CollectionReference collectionRef = firestore.collection("Contents");//컨텐츠 컬렉션
+        DocumentSnapshot documentSnapshot = collectionRef.document(documentId).get().get();
+
+        if(documentSnapshot.exists()){
+            ContentsDetailDTO contentsDetailDTO = documentSnapshot.toObject(ContentsDetailDTO.class);
+            contentsDetailDTO.getImgPath().stream().map(img->{
+                try {
+                    String encodedURL = URLEncoder.encode(img, "UTF-8");
+                    return "https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+encodedURL + "?alt=media&token=";
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                }
+            }).toList();
+            return contentsDetailDTO;
+        }else{
+            return null;
+        }
+
+    }
+
     //컨텐츠 등록
     public String setContents(ContentsDTO contentsDTO) throws ExecutionException, InterruptedException{
 
         ModelMapper modelMapper = new ModelMapper();
         Contents contents = modelMapper.map(contentsDTO, Contents.class);//받은 데이터 매핑
         contents.setImgPath(setContentsFilePath(contentsDTO.getImgPath()));//파일 경로 저장
+        contents.setThumbnailImg(contents.getImgPath().get(0));//첫번째 사진 썸네일로 저장
         LocalDateTime localDateTime = LocalDateTime.now();
         // LocalDateTime을 Instant로 변환
         java.time.Instant instant = localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant();
         // Instant를 Date로 변환
         Date createdDate = java.util.Date.from(instant);
         contents.setCreatedDate(createdDate);//게시글 등록 시간
+        contents.setWriterId(userService.loginUserDocumentId());//로그인한 사람 글쓴이로 저장
 
         CollectionReference collectionRef =firestore.collection("Contents");//컬렉션참조
         ApiFuture<DocumentReference> result = collectionRef.add(contents);//저장

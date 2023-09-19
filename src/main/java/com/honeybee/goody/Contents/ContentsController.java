@@ -41,7 +41,7 @@ public class ContentsController {
         return ResponseEntity.ok(posts);
     }
 
-    @Operation(summary = "게시글 미리보기", description = "판매해요,구해요,같이해요 게시글 미리보기")
+    @Operation(summary = "게시글 검색", description = "파라미터값에 따라 검색")
     @GetMapping( "/search")
     public ResponseEntity<List<PreviewDTO>> contentsSearch(@Parameter(description = "검색어") @RequestParam(required = false) String search,
                                                        @Parameter(description = "") @RequestParam(required = false) String category,
@@ -51,6 +51,14 @@ public class ContentsController {
 
         List<PreviewDTO> list = contentsService.SearchPreviewContents(search,category,transType,sold);
         return ResponseEntity.ok(list);
+    }
+
+    @Operation(summary = "게시글 상세정보", description = "게시글 문서아이디로 상세정보 반환")
+    @GetMapping("/detail")
+    public ResponseEntity<ContentsDetailDTO> contentDetail(@Parameter(description = "게시글 documentId") @RequestParam String documentId)
+        throws ExecutionException, InterruptedException {
+        ContentsDetailDTO contentsDetailDTO = contentsService.getContentsDetail(documentId);
+        return ResponseEntity.ok(contentsDetailDTO);
     }
 
     @Operation(summary = "게시글 작성", description = "게시글 작성하기")
