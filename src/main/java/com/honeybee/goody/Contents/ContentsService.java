@@ -103,7 +103,13 @@ public class ContentsService {
                 .map(document->{
                     PreviewDTO previewDTO = document.toObject(PreviewDTO.class);
                     previewDTO.setDocumentId(document.getId());
-                    return previewDTO;
+                    try {
+                        String encodedURL = URLEncoder.encode(previewDTO.getThumbnailImg(), "UTF-8");
+                        previewDTO.setThumbnailImg("https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+encodedURL + "?alt=media&token=");
+                        return previewDTO;
+                    } catch (UnsupportedEncodingException e) {
+                        throw new RuntimeException(e);
+                    }
                 }).toList();
         //총개수..?
 
