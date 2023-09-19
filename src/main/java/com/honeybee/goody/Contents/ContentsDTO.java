@@ -1,6 +1,5 @@
 package com.honeybee.goody.Contents;
 
-import java.util.Date;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

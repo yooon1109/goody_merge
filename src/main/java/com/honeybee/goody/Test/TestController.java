@@ -1,7 +1,6 @@
 package com.honeybee.goody.Test;
 
 import io.swagger.v3.oas.annotations.Operation;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

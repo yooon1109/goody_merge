@@ -1,8 +1,18 @@
 package com.honeybee.goody.Collection;
 
-import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.*;
-
+import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.Query;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.cloud.StorageClient;
+import com.honeybee.goody.User.UserService;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -10,15 +20,12 @@ import java.net.URLEncoder;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
-import com.google.cloud.storage.*;
-import com.google.cloud.storage.Blob;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.cloud.StorageClient;
-import com.honeybee.goody.Contents.PreviewDTO;
-import com.honeybee.goody.User.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

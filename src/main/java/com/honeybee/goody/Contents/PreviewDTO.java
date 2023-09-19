@@ -1,11 +1,7 @@
 package com.honeybee.goody.Contents;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-
-
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
