@@ -55,10 +55,12 @@ public class ContentsController {
 
     @Operation(summary = "게시글 상세정보", description = "게시글 문서아이디로 상세정보 반환")
     @GetMapping("/detail")
-    public ResponseEntity<String> contentDetail(@Parameter(description = "게시글 documentId") @RequestParam String documentId){
-
-        return null;
+    public ResponseEntity<ContentsDetailDTO> contentDetail(@Parameter(description = "게시글 documentId") @RequestParam String documentId)
+        throws ExecutionException, InterruptedException {
+        ContentsDetailDTO contentsDetailDTO = contentsService.getContentsDetail(documentId);
+        return ResponseEntity.ok(contentsDetailDTO);
     }
+
     @Operation(summary = "게시글 작성", description = "게시글 작성하기")
     @PostMapping(value = "/",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> postDetail(@ModelAttribute ContentsDTO contentsDTO)

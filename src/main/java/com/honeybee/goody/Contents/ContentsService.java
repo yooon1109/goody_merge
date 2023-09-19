@@ -3,6 +3,7 @@ package com.honeybee.goody.Contents;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QuerySnapshot;
@@ -107,6 +108,29 @@ public class ContentsService {
         //총개수..?
 
         return contents;
+
+    }
+
+    //컨텐츠 상세 정보
+    public ContentsDetailDTO getContentsDetail(String documentId)
+        throws ExecutionException, InterruptedException {
+        CollectionReference collectionRef = firestore.collection("Contents");//컨텐츠 컬렉션
+        DocumentSnapshot documentSnapshot = collectionRef.document(documentId).get().get();
+
+        if(documentSnapshot.exists()){
+            ContentsDetailDTO contentsDetailDTO = documentSnapshot.toObject(ContentsDetailDTO.class);
+            contentsDetailDTO.getImgPath().stream().map(img->{
+                try {
+                    String encodedURL = URLEncoder.encode(img, "UTF-8");
+                    return "https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+encodedURL + "?alt=media&token=";
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                }
+            }).toList();
+            return contentsDetailDTO;
+        }else{
+            return null;
+        }
 
     }
 
