@@ -7,6 +7,7 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.honeybee.goody.File.FileService;
+import com.honeybee.goody.User.UserService;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -26,11 +27,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class ContentsService {
     private final Firestore firestore;
     private final FileService fileService;
+    private final UserService userService;
 
     @Autowired
-    public ContentsService(Firestore firestore, FileService fileService) {
+    public ContentsService(Firestore firestore, FileService fileService, UserService userService) {
         this.firestore = firestore;
         this.fileService = fileService;
+        this.userService = userService;
     }
 
     //컨텐츠 미리보기
@@ -113,12 +116,14 @@ public class ContentsService {
         ModelMapper modelMapper = new ModelMapper();
         Contents contents = modelMapper.map(contentsDTO, Contents.class);//받은 데이터 매핑
         contents.setImgPath(setContentsFilePath(contentsDTO.getImgPath()));//파일 경로 저장
+        contents.setThumbnailImg(contents.getImgPath().get(0));//첫번째 사진 썸네일로 저장
         LocalDateTime localDateTime = LocalDateTime.now();
         // LocalDateTime을 Instant로 변환
         java.time.Instant instant = localDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant();
         // Instant를 Date로 변환
         Date createdDate = java.util.Date.from(instant);
         contents.setCreatedDate(createdDate);//게시글 등록 시간
+        contents.setWriterId(userService.loginUserDocumentId());//로그인한 사람 글쓴이로 저장
 
         CollectionReference collectionRef =firestore.collection("Contents");//컬렉션참조
         ApiFuture<DocumentReference> result = collectionRef.add(contents);//저장
