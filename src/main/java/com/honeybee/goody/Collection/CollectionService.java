@@ -1,11 +1,8 @@
 package com.honeybee.goody.Collection;
 
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.Query;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.Timestamp;
+import com.google.cloud.firestore.*;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
@@ -20,11 +17,7 @@ import java.net.URLEncoder;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -91,26 +84,34 @@ public class CollectionService {
         DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
         List<QueryDocumentSnapshot> documents = userDocRef.collection("myCollection").orderBy("createdDate", Query.Direction.DESCENDING).get().get().getDocuments();
 
+
         List<CollectionListDTO> dtoList = documents.stream().map(document -> {
             Map<String, Object> data = document.getData();
             CollectionListDTO dto = document.toObject(CollectionListDTO.class);
 
             dto.setCollectionId(data.get("collectionId").toString());
-            List<String> images = (List<String>) data.get("images");
-            String thumbnail = images.get(0).toString();
 
-            try {
-                String encodedURL = URLEncoder.encode(thumbnail, "UTF-8");
-                dto.setThumbnail("https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+ encodedURL + "?alt=media&token=");
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
+            // 여기에서 "images" 값이 비어있는지 확인, 비어있으면 NULL로 반환, 있으면 URL로 반환
+            List<String> images = (List<String>) data.getOrDefault("images", Collections.emptyList());
+            String thumbnail = !images.isEmpty() ? images.get(0).toString() : "NULL";
+
+            String encodedURL;
+            if (thumbnail.equals("NULL")) {
+                encodedURL = "NULL";
             }
-
-            return dto;
-        }).toList();
+            else {
+                try {
+                    encodedURL = URLEncoder.encode(thumbnail, "UTF-8");
+                    dto.setThumbnail("https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/" + encodedURL + "?alt=media&token=");
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+                return dto;
+            }).toList();
 
         Map<String, Object> response = new HashMap<>();
-        response.put("data", dtoList);
+        response.put("dto", dtoList);
         return response;
     }
 
@@ -146,9 +147,8 @@ public class CollectionService {
 
         myCollectionRef.add(data);
 
-        return new ResponseEntity<>("Collection added successfully", HttpStatus.CREATED);
+        return ResponseEntity.ok("잘 됨!");
     }
-
     private List<String> saveImagesToStorage(String collectionId, List<MultipartFile> images) {
         List<String> imageUrls = new ArrayList<>();
         try {
