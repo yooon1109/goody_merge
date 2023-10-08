@@ -117,17 +117,21 @@ public class CollectionService {
 
     public ResponseEntity<String> createCollection(CollectionInputDTO inputData) throws Exception {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        CollectionReference myCollectionRef = this.firestore.collection("Users")
-                .whereEqualTo("userId", userDetails.getUsername())
-                .get()
-                .get()
-                .getDocuments()
-                .get(0)
-                .getReference()
-                .collection("myCollection");
+        //도큐먼트 아이디로 유저 컬렉션 정보 가져옴
+        String userDocumentId = userService.loginUserDocumentId();
+        DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+        CollectionReference myCollectionRef = userDocRef.collection("myCollection");
 
-        int newCollectionCount = myCollectionRef.get().get().size() + 1;
-        String newCollectionId = userDetails.getUsername() + "-" + newCollectionCount;
+        //유저의 컬렉션카운트 필드 값 가져옴
+        Long collectionCnt = userDocRef.get().get().getLong("collectionCnt");
+        //컬렉션 카운트 값 증가해서 넣기
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("collectionCnt", (Long)collectionCnt+1);
+        userDocRef.update(updates);
+
+        long newCollectionCnt = collectionCnt+1;
+        //작성하는 컬렉션의 컬렉션 아이디 만들어줌
+        String newCollectionId = userDetails.getUsername() + "-" + newCollectionCnt;
         List<String> imageUrls = saveImagesToStorage(newCollectionId, inputData.getImages());
 
         Map<String, Object> data = new HashMap<>();
@@ -141,8 +145,8 @@ public class CollectionService {
         Instant instant = now.atZone(zoneId).toInstant();
         Date date = Date.from(instant);
 
-        com.google.cloud.Timestamp firestoreTimestamp = com.google.cloud.Timestamp.of(date);
-        java.util.Date createdDate = firestoreTimestamp.toDate();
+        Timestamp firestoreTimestamp = Timestamp.of(date);
+        Date createdDate = firestoreTimestamp.toDate();
         data.put("createdDate", createdDate);
 
         myCollectionRef.add(data);
