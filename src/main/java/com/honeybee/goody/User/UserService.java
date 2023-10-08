@@ -6,6 +6,7 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.honeybee.goody.Test.Test;
+import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -22,6 +23,7 @@ public class UserService implements UserDetailsService {
         this.firestore = firestore;
     }
 
+    @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         try {
             CollectionReference collectionRef = this.firestore.collection("Users");
@@ -29,22 +31,25 @@ public class UserService implements UserDetailsService {
             QuerySnapshot querySnapshot = (QuerySnapshot)querySnapshotFuture.get();
             if (!querySnapshot.isEmpty()) {
                 DocumentSnapshot documentSnapshot = (DocumentSnapshot)querySnapshot.getDocuments().get(0);
-                Test user = (Test)documentSnapshot.toObject(Test.class);
-                return User
-                        .builder()
-                        .username(user.getUserId())
-                        .password(user.getUserPw())
+                Test user = (Test) documentSnapshot.toObject(Test.class);
 
-//                        .authorities()//권한부여
-                        .build();//유저 정보
-            } else {
-                System.out.println("존재하지 않는 유저");
-                return null;
+                return User
+                    .builder()
+                    .username(user.getUserId())
+                    .password(user.getUserPw())
+                    .authorities(String.valueOf(Collections.singletonList("ROLE_USER")))//권한부여 일단은 임시로 user
+                    .build();//유저 정보
+
+            }else {
+                throw new UsernameNotFoundException("User not found with username: " + userId);
+
             }
         } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+
     }
+
 
     //현재 로그인 한 사람의 정보를 통해 그 유저의 documentId값을 찾아오기
     public String  loginUserDocumentId() throws ExecutionException, InterruptedException {

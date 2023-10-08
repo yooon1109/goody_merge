@@ -2,6 +2,7 @@ package com.honeybee.goody.Contents;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,9 +64,9 @@ public class ContentsController {
 
     @Operation(summary = "게시글 작성", description = "게시글 작성하기")
     @PostMapping(value = "/",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> postDetail(@ModelAttribute ContentsDTO contentsDTO)
+    public ResponseEntity<String> postDetail(@ModelAttribute ContentsInsertDTO contentsInsertDTO)
         throws ExecutionException, InterruptedException {
-        String postId = contentsService.setContents(contentsDTO);
+        String postId = contentsService.setContents(contentsInsertDTO);
         return ResponseEntity.ok(postId);
     }
 }

@@ -1,9 +1,13 @@
 package com.honeybee.goody.User;
 
-import java.util.concurrent.ExecutionException;
+import com.honeybee.goody.Jwt.AuthService;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,14 +16,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final AuthenticationService authenticationService;
+    @Autowired
     private final UserService userService;
-    @GetMapping("/get")
-    public ResponseEntity<String> userLogin() throws ExecutionException, InterruptedException {
+    @Autowired
+    private final AuthService authService;
 
-        //UserRecord user = authenticationService.verifyUser(userId,password);//firebase auth로 정보 가져오기
-        String userDocumentId = userService.loginUserDocumentId();
-
-        return ResponseEntity.ok(userDocumentId);
+    // 로그인
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody Map<String,String> user) {
+        //authenticate에서는 인증 실패시 예외처리가 아이디 비번 구분 불가능해서 일단
+        userService.loadUserByUsername(user.get("userId"));//유저 아이디 오류 예외처리용으로 사용
+        String token = authService.authenticate(user.get("userId"),user.get("userPw"));//
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Authorization","Bearer " + token);//헤더 세팅
+        return ResponseEntity.ok().headers(httpHeaders).body(token);
     }
 }

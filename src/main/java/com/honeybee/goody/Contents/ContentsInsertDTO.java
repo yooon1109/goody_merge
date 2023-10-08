@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor(staticName = "of")
 @Getter
 @Setter
-public class ContentsDTO {//프론트에서 받아올 데이터들
+public class ContentsInsertDTO {//프론트에서 받아올 데이터들
 
     //카테고리
     private String category;

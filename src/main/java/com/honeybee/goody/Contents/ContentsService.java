@@ -49,7 +49,9 @@ public class ContentsService {
         QuerySnapshot querySnapshot = querySnapshotFuture.get();
         List<PreviewDTO> posts = querySnapshot.getDocuments().stream()
             .map(doc -> {
-                PreviewDTO previewDTO = doc.toObject(PreviewDTO.class);
+                Contents contents = doc.toObject(Contents.class);
+                ModelMapper modelMapper = new ModelMapper();
+                PreviewDTO previewDTO = modelMapper.map(contents, PreviewDTO.class);
                 previewDTO.setDocumentId(doc.getId()); // 문서의 ID를 설정
                 try {
                     String encodedURL = URLEncoder.encode(previewDTO.getThumbnailImg(), "UTF-8");
@@ -101,7 +103,9 @@ public class ContentsService {
         ApiFuture<QuerySnapshot> querySnapshot = query.get();
         List<PreviewDTO> contents = querySnapshot.get().getDocuments().stream()
                 .map(document->{
-                    PreviewDTO previewDTO = document.toObject(PreviewDTO.class);
+                    Contents con = document.toObject(Contents.class);
+                    ModelMapper modelMapper = new ModelMapper();
+                    PreviewDTO previewDTO = modelMapper.map(con, PreviewDTO.class);
                     previewDTO.setDocumentId(document.getId());
                     try {
                         String encodedURL = URLEncoder.encode(previewDTO.getThumbnailImg(), "UTF-8");
@@ -111,7 +115,7 @@ public class ContentsService {
                         throw new RuntimeException(e);
                     }
                 }).toList();
-        //총개수..?
+        //총개수 추가하기
 
         return contents;
 
@@ -124,7 +128,9 @@ public class ContentsService {
         DocumentSnapshot documentSnapshot = collectionRef.document(documentId).get().get();
 
         if(documentSnapshot.exists()){
-            ContentsDetailDTO contentsDetailDTO = documentSnapshot.toObject(ContentsDetailDTO.class);
+            Contents contents = documentSnapshot.toObject(Contents.class);
+            ModelMapper modelMapper = new ModelMapper();
+            ContentsDetailDTO contentsDetailDTO = modelMapper.map(contents, ContentsDetailDTO.class);
             contentsDetailDTO.getImgPath().stream().map(img->{
                 try {
                     String encodedURL = URLEncoder.encode(img, "UTF-8");
@@ -141,11 +147,11 @@ public class ContentsService {
     }
 
     //컨텐츠 등록
-    public String setContents(ContentsDTO contentsDTO) throws ExecutionException, InterruptedException{
+    public String setContents(ContentsInsertDTO contentsInsertDTO) throws ExecutionException, InterruptedException{
 
         ModelMapper modelMapper = new ModelMapper();
-        Contents contents = modelMapper.map(contentsDTO, Contents.class);//받은 데이터 매핑
-        contents.setImgPath(setContentsFilePath(contentsDTO.getImgPath()));//파일 경로 저장
+        Contents contents = modelMapper.map(contentsInsertDTO, Contents.class);//받은 데이터 매핑
+        contents.setImgPath(setContentsFilePath(contentsInsertDTO.getImgPath()));//파일 경로 저장
         contents.setThumbnailImg(contents.getImgPath().get(0));//첫번째 사진 썸네일로 저장
         LocalDateTime localDateTime = LocalDateTime.now();
         // LocalDateTime을 Instant로 변환
@@ -159,13 +165,13 @@ public class ContentsService {
         ApiFuture<DocumentReference> result = collectionRef.add(contents);//저장
 
         //만약 같이해요일 경우
-        if(contentsDTO.getTransType().equals("같이해요")){
+        if(contentsInsertDTO.getTransType().equals("같이해요")){
             DocumentReference contentsDocRef = result.get(); // Contents 문서 참조
             Map<String, Object> togetherData = new HashMap<>();
-            if(contentsDTO.getNumOfPeople()!=null){
-                togetherData.put("numOfPeople",contentsDTO.getNumOfPeople());
-            }else if(contentsDTO.getPeople()!=null){
-                togetherData.put("people",contentsDTO.getPeople());
+            if(contentsInsertDTO.getNumOfPeople()!=null){
+                togetherData.put("numOfPeople", contentsInsertDTO.getNumOfPeople());
+            }else if(contentsInsertDTO.getPeople()!=null){
+                togetherData.put("people", contentsInsertDTO.getPeople());
             }
             contentsDocRef.update(togetherData);
         }
