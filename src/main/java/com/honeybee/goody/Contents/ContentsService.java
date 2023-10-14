@@ -1,26 +1,19 @@
 package com.honeybee.goody.Contents;
 
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.Query;
-import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.*;
 import com.honeybee.goody.File.FileService;
 import com.honeybee.goody.User.UserService;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,6 +35,7 @@ public class ContentsService {
         //컬렉션참조
         CollectionReference collectionRef = firestore.collection("Contents");//필드를 기준으로 내림차순 정렬
         Query query = collectionRef.orderBy("createdDate", Query.Direction.ASCENDING);
+
         int pageSize = 5; // 페이지 크기
 
         ApiFuture<QuerySnapshot> querySnapshotFuture = query.whereEqualTo("transType", type)
@@ -79,8 +73,9 @@ public class ContentsService {
     //컨텐츠 검색
     public List<PreviewDTO> SearchPreviewContents(String search,String category,String transType, Boolean sold) throws ExecutionException, InterruptedException {
         CollectionReference collectionRef = firestore.collection("Contents");
-
         Query query = collectionRef;
+
+        //Query query = collectionRef.orderBy("createdDate", Query.Direction.DESCENDING);
         if(search!=null){
             // 'title' 필드 또는 'explain' 필드에서 검색 후 정렬->title 완전 일치만 검색 가능
             query = query
@@ -195,4 +190,22 @@ public class ContentsService {
     }
 
     //페이지 그 그거 암튼 추후에 수정 중복되는 코드 수정
+
+    public ResponseEntity<String> setContentsLikes(String documentId)throws ExecutionException,InterruptedException{
+        String userDocumentId = userService.loginUserDocumentId();
+        DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+
+        List<Object> likes = (List<Object>) userDocRef.get().get().get("likes");
+        System.out.println("tetetst1" + likes);
+
+        likes.add(documentId);
+        System.out.println("tetetst2" + likes);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("likes", likes);
+        userDocRef.update(updates);
+
+        return ResponseEntity.ok("잘 됨!");
+
+    }
 }

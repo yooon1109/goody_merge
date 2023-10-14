@@ -1,6 +1,5 @@
 package com.honeybee.goody.Collection;
 
-import com.google.api.core.ApiFuture;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.*;
 import com.google.cloud.storage.Blob;
@@ -20,12 +19,12 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.modelmapper.ModelMapper;
 
 @Service
 public class CollectionService {
@@ -39,29 +38,22 @@ public class CollectionService {
         this.userService = userService;
     }
 
-    public Map<String,Object> getCollectionDetail(String collectionId) throws Exception {
+    public CollectionDetailDTO getCollectionDetail(String collectionId) throws Exception {
         String userDocumentId = userService.loginUserDocumentId();
         CollectionReference myCollectionRef = firestore.collection("Users").document(userDocumentId).collection("myCollection");
         DocumentSnapshot documentSnapshot = myCollectionRef.whereEqualTo("collectionId", collectionId).get().get().getDocuments().get(0);
 
+        ModelMapper modelMapper = new ModelMapper();
+
         if (documentSnapshot.exists()) {
-            Map<String, Object> data = documentSnapshot.getData();
+            CollectionDetailDTO collectionDTO = modelMapper.map(documentSnapshot.getData(), CollectionDetailDTO.class);
 
-            CollectionDetailDTO collectionDTO = documentSnapshot.toObject(CollectionDetailDTO.class);
-            collectionDTO.setCollectionId((String) data.get("collectionId"));
-            collectionDTO.setContent((String) data.get("content"));
-            collectionDTO.setTitle((String) data.get("title"));
-            collectionDTO.setImages((List<String>) data.get("images"));
-
-            com.google.cloud.Timestamp firestoreTimestamp = (com.google.cloud.Timestamp) documentSnapshot.get("createdDate");
+            // createdDate 필드를 매핑
+            com.google.cloud.Timestamp firestoreTimestamp = documentSnapshot.get("createdDate", com.google.cloud.Timestamp.class);
             java.util.Date createdDate = firestoreTimestamp.toDate();
             collectionDTO.setCreatedDate(createdDate);
 
-            Map<String, Object> responseData = new HashMap<>();
-            responseData.put("collectionId", collectionDTO.getCollectionId());
-            responseData.put("content", collectionDTO.getContent());
-            responseData.put("title", collectionDTO.getTitle());
-            responseData.put("createdDate", collectionDTO.getCreatedDate());
+            // images를 변환하고 매핑
             List<String> images = collectionDTO.getImages().stream().map(image -> {
                 try {
                     String encodedURL = URLEncoder.encode(image, "UTF-8");
@@ -70,10 +62,9 @@ public class CollectionService {
                     throw new RuntimeException(e);
                 }
             }).toList();
+            collectionDTO.setImages(images);
 
-            responseData.put("images", images);
-
-            return responseData;
+            return collectionDTO;
         } else {
             throw new Exception("없음!!");
         }
@@ -152,6 +143,8 @@ public class CollectionService {
         myCollectionRef.add(data);
 
         return ResponseEntity.ok("잘 됨!");
+
+
     }
     private List<String> saveImagesToStorage(String collectionId, List<MultipartFile> images) {
         List<String> imageUrls = new ArrayList<>();

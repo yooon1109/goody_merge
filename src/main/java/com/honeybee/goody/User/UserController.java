@@ -2,19 +2,19 @@ package com.honeybee.goody.User;
 
 import com.honeybee.goody.Jwt.AuthService;
 import java.util.Map;
+
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("user")
 @RequiredArgsConstructor
-public class UserController {
+public class
+UserController {
 
     @Autowired
     private final UserService userService;
@@ -31,4 +31,10 @@ public class UserController {
         httpHeaders.add("Authorization","Bearer " + token);//헤더 세팅
         return ResponseEntity.ok().headers(httpHeaders).body(token);
     }
+
+//    @Operation(summary = "마이페이지", description = "유저의 마이페이지 첫 화면")
+//    @GetMapping("/userHome")
+//    public Map<String, Object> getCollectionList() throws Exception {
+//        return collectionService.getCollectionList();
+//    }
 }
