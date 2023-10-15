@@ -28,7 +28,7 @@ public class Contents {//게시글 컨텐츠 등록할 데이터들
     //게시글 제목
     private String title;
     //상품가격
-    private int price;
+    private Integer price;
     //나눔인지 아닌지
     private boolean free;
     //상품 설명

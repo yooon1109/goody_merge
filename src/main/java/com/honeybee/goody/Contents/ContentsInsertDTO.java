@@ -34,7 +34,7 @@ public class ContentsInsertDTO {//프론트에서 받아올 데이터들
     private String title;
     //상품가격
     @Schema(description = "가격", example = "12000")
-    private int price;
+    private Integer price;
     //나눔인지 아닌지
     @Schema(description = "나눔여부", example = "true,false")
     private boolean free;

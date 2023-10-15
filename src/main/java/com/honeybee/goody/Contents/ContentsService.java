@@ -126,14 +126,17 @@ public class ContentsService {
             Contents contents = documentSnapshot.toObject(Contents.class);
             ModelMapper modelMapper = new ModelMapper();
             ContentsDetailDTO contentsDetailDTO = modelMapper.map(contents, ContentsDetailDTO.class);
-            contentsDetailDTO.getImgPath().stream().map(img->{
+            List<String> imgPathList = contentsDetailDTO.getImgPath().stream().map(img->{
                 try {
                     String encodedURL = URLEncoder.encode(img, "UTF-8");
-                    return "https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+encodedURL + "?alt=media&token=";
+
+                    return "https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+ encodedURL + "?alt=media&token=";
                 } catch (UnsupportedEncodingException e) {
                     throw new RuntimeException(e);
                 }
             }).toList();
+            contentsDetailDTO.setImgPath(imgPathList);
+
             return contentsDetailDTO;
         }else{
             return null;

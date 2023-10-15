@@ -25,7 +25,7 @@ public class ContentsDetailDTO {
     //게시글 제목
     private String title;
     //상품가격
-    private int price;
+    private Integer price;
     //나눔인지 아닌지
     private boolean free;
     //상품 설명

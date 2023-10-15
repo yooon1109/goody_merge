@@ -25,15 +25,16 @@ public class ContentsController {
                                                           @Parameter(description = "페이지") @RequestParam int page)
         throws ExecutionException, InterruptedException {
         Map<String,Object> posts = new HashMap<>();
-        if(transType.equals("판매해요")){
-            posts = contentsService.getPreviewContents("판매해요",page);
-        } else if (transType.equals("구해요")) {
-            posts = contentsService.getPreviewContents("구해요",page);
-        } else if (transType.equals("같이해요")) {
-            posts = contentsService.getPreviewContents("같이해요",page);
-        }else {
-            return ResponseEntity.badRequest().build();
-        }
+        posts = contentsService.getPreviewContents(transType,page);
+//        if(transType.equals("판매해요")){
+//            posts = contentsService.getPreviewContents("판매해요",page);
+//        } else if (transType.equals("구해요")) {
+//            posts = contentsService.getPreviewContents("구해요",page);
+//        } else if (transType.equals("같이해요")) {
+//            posts = contentsService.getPreviewContents("같이해요",page);
+//        }else {
+//            return ResponseEntity.badRequest().build();
+//        }
         return ResponseEntity.ok(posts);
     }
 
