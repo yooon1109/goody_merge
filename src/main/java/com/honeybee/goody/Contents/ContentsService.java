@@ -194,6 +194,7 @@ public class ContentsService {
 
     //페이지 그 그거 암튼 추후에 수정 중복되는 코드 수정
 
+    //좋아요 등록
     public String addContentsLike(String documentId)throws ExecutionException,InterruptedException{
         String userDocumentId = userService.loginUserDocumentId();
         DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
@@ -210,6 +211,7 @@ public class ContentsService {
 
     }
 
+    //좋아요 취소
     public String removeContentsLike(String documentId)throws ExecutionException,InterruptedException{
         String userDocumentId = userService.loginUserDocumentId();
         DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
