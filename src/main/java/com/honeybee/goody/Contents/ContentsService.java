@@ -194,21 +194,39 @@ public class ContentsService {
 
     //페이지 그 그거 암튼 추후에 수정 중복되는 코드 수정
 
-    public ResponseEntity<String> setContentsLikes(String documentId)throws ExecutionException,InterruptedException{
+    public String addContentsLike(String documentId)throws ExecutionException,InterruptedException{
         String userDocumentId = userService.loginUserDocumentId();
         DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
 
         List<Object> likes = (List<Object>) userDocRef.get().get().get("likes");
-        System.out.println("tetetst1" + likes);
 
         likes.add(documentId);
-        System.out.println("tetetst2" + likes);
 
         Map<String, Object> updates = new HashMap<>();
         updates.put("likes", likes);
         userDocRef.update(updates);
 
-        return ResponseEntity.ok("잘 됨!");
+        return documentId;
 
     }
+
+    public String removeContentsLike(String documentId)throws ExecutionException,InterruptedException{
+        String userDocumentId = userService.loginUserDocumentId();
+        DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+
+        //likes 필드 배열
+        DocumentSnapshot userDocSnapshot = userDocRef.get().get();
+        List<Object> likes = (List<Object>) userDocSnapshot.get("likes");
+
+        likes.remove(documentId);
+
+        // 업데이트된 likes 배열을 저장
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("likes", likes);
+        userDocRef.update(updates);
+
+        return documentId;
+
+    }
+
 }
