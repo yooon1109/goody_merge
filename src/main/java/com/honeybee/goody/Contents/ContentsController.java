@@ -66,10 +66,21 @@ public class ContentsController {
     }
 
     @Operation(summary = "게시글 좋아요", description = "게시글 좋아요 버튼")
-    @PostMapping("/likes")
-    public ResponseEntity<String> contentsLikes(@Parameter(description = "게시글 documentId") @RequestParam String documentId) throws ExecutionException, InterruptedException {
-        return contentsService.setContentsLikes(documentId);
+    @PostMapping("/addlike")
+    public ResponseEntity<String> contentsLikes(@Parameter(description = "게시글 documentId") @RequestParam String documentId)
+            throws ExecutionException, InterruptedException {
+
+        String id = contentsService.addContentsLike(documentId);
+        return ResponseEntity.ok(id);
     }
 
+    @Operation(summary = "게시글 좋아요 취소", description = "게시글 좋아요 취소")
+    @PostMapping("/removeLike")
+    public ResponseEntity<String> removeLike(@Parameter(description = "게시글 documentId") @RequestParam String documentId)
+            throws ExecutionException, InterruptedException {
+
+        String id = contentsService.removeContentsLike(documentId);
+        return ResponseEntity.ok(id);
+    }
 
 }
