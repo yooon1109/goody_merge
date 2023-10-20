@@ -12,6 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 @Setter
 public class ContentsDetailDTO {
 
+    //글쓴이 유저문서아이디
+    private String writerDocumentId;
+    //글쓴이 아이디
+    private String writerId;
     //카테고리
     private String category;
     //상품 거래종류

@@ -31,7 +31,8 @@ public class UserService implements UserDetailsService {
             QuerySnapshot querySnapshot = (QuerySnapshot)querySnapshotFuture.get();
             if (!querySnapshot.isEmpty()) {
                 DocumentSnapshot documentSnapshot = (DocumentSnapshot)querySnapshot.getDocuments().get(0);
-                Test user = (Test) documentSnapshot.toObject(Test.class);
+                com.honeybee.goody.User.User user = (com.honeybee.goody.User.User) documentSnapshot.toObject(
+                    com.honeybee.goody.User.User.class);
 
                 return User
                     .builder()

@@ -136,7 +136,9 @@ public class ContentsService {
                 }
             }).toList();
             contentsDetailDTO.setImgPath(imgPathList);
-
+            DocumentSnapshot doc = firestore.collection("Users").document(contents.getWriterId()).get().get();
+            contentsDetailDTO.setWriterDocumentId(contents.getWriterId());
+            contentsDetailDTO.setWriterId(doc.getString("userId"));
             return contentsDetailDTO;
         }else{
             return null;
