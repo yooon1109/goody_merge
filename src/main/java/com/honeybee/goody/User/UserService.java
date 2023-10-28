@@ -6,16 +6,20 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.honeybee.goody.Test.Test;
-import java.util.Collections;
-import java.util.concurrent.ExecutionException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.concurrent.ExecutionException;
 
 @Component
+@Service
+
 public class UserService implements UserDetailsService {
     private final Firestore firestore;
 
@@ -52,7 +56,7 @@ public class UserService implements UserDetailsService {
 
 
     //현재 로그인 한 사람의 정보를 통해 그 유저의 documentId값을 찾아오기
-    public String  loginUserDocumentId() throws ExecutionException, InterruptedException {
+    public String loginUserDocumentId() throws ExecutionException, InterruptedException {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         CollectionReference collectionRef = this.firestore.collection("Users");
         ApiFuture<QuerySnapshot> querySnapshotFuture = collectionRef.whereEqualTo("userId", userDetails.getUsername()).get();
@@ -66,4 +70,16 @@ public class UserService implements UserDetailsService {
         }
 
     }
+
+    //회원가입
+//    public String userJoin(UserJoinDTO userJoinDTO) throws ExecutionException, InterruptedException {
+//
+//        String encodedPassword = passwordEncoder.encode(userJoinDTO.getUserPw());
+//        userJoinDTO.setUserPw(encodedPassword);
+//
+//        //컬렉션참조
+//        CollectionReference collectionRef = firestore.collection("Users");
+//        ApiFuture<DocumentReference> result = collectionRef.add(userJoinDTO);
+//        return userJoinDTO.getUserId()+"성공";
+//    }
 }

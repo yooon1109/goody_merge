@@ -1,22 +1,31 @@
 package com.honeybee.goody.Test;
 
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.QuerySnapshot;
-import java.util.concurrent.ExecutionException;
+import com.google.cloud.Timestamp;
+import com.google.cloud.firestore.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class TestService {
 
     Test user;
     private final Firestore firestore;
+    @Autowired
+    private final PasswordEncoder passwordEncoder;
 
-    public TestService(Firestore firestore) {
+    public TestService(Firestore firestore, PasswordEncoder passwordEncoder) {
         this.firestore = firestore;
+        this.passwordEncoder = passwordEncoder;// userPw를 암호화
     }
 
     public Test getUser(String collection, String id) throws ExecutionException, InterruptedException {
@@ -46,10 +55,36 @@ public class TestService {
 
     }
 
-    public String setUser(Test user) throws ExecutionException, InterruptedException {
+    public String userJoin(UserJoinDTO userJoinDTO) throws ExecutionException, InterruptedException {
+
+        String encodedPassword = passwordEncoder.encode(userJoinDTO.getUserPw());
+
+        // DTO의 데이터와 추가적인 데이터를 Map에 저장
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("userId", userJoinDTO.getUserId());
+        userData.put("userPw", encodedPassword);
+        userData.put("birth", userJoinDTO.getBirth());
+        userData.put("userName", userJoinDTO.getUserName());
+        userData.put("userPhoneNum", userJoinDTO.getUserPhoneNum());
+
+        userData.put("accountBank", "입력해주세요");
+        userData.put("accountNum", "입력해주세요");
+        userData.put("address", "입력해주세요");
+        userData.put("nickname", "입력해주세요");
+        userData.put("collectionCnt", 0);
+        userData.put("grade", "애기꿀벌");
+
+        LocalDateTime now = LocalDateTime.now();
+        ZoneId zoneId = ZoneId.systemDefault();
+        Instant instant = now.atZone(zoneId).toInstant();
+        Date date = Date.from(instant);
+        Timestamp firestoreTimestamp = Timestamp.of(date);
+        Date createdDate = firestoreTimestamp.toDate();
+        userData.put("joinDate", createdDate);
+
         //컬렉션참조
-        CollectionReference collectionRef =firestore.collection("USER");
-        ApiFuture<DocumentReference> result = collectionRef.add(user);
-        return user.getUserId()+"성공";
+        CollectionReference collectionRef = firestore.collection("Users");
+        collectionRef.add(userData);
+        return userJoinDTO.getUserId()+"성공";
     }
 }

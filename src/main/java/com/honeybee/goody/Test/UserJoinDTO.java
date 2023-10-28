@@ -1,4 +1,4 @@
-package com.honeybee.goody.MyPage;
+package com.honeybee.goody.Test;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -12,22 +12,17 @@ import java.util.Date;
 @AllArgsConstructor(staticName = "of")
 @Getter
 @Setter
-public class MyPageHomeDTO {
 
-    private String nickname;
+public class UserJoinDTO {
 
-    private String grade;
+    private String userId;
+    private String userPw;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date joinDate;
+    private Date birth;
 
-    private String accountNum;
+    private String userName;
 
-    private long daysSinceJoin;
+    private String userPhoneNum;
 
-    public void setDaysSinceJoin(long daysSinceJoin) {
-        this.daysSinceJoin = daysSinceJoin;
-    }
-
-    private String address;
 }

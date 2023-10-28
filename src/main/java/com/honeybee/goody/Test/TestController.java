@@ -1,17 +1,12 @@
 package com.honeybee.goody.Test;
 
 import io.swagger.v3.oas.annotations.Operation;
-import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("test")
@@ -19,12 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
     Test user;
     private final TestService testService;
-//    @GetMapping("/get")
-//    public ResponseEntity<User> test() throws ExecutionException, InterruptedException {
-//        User user = userService.getUser();
-//
-//        return ResponseEntity.ok(user);
-//    }
 
     @Operation(summary = "유저 검색", description = "파라미터 값(id)에 해당하는 조건의 유저를 검색.")
     @GetMapping("/get")// ?id="yooon"
@@ -56,10 +45,10 @@ public class TestController {
         }
     }
 
-    @Operation(summary = "유저 등록", description = "")
-    @PostMapping("/post")
-    public ResponseEntity<String> postTest(@RequestBody Test user) throws ExecutionException, InterruptedException {
-        String newUser = testService.setUser(user);
+    @Operation(summary = "회원가입", description = "회원가입")
+    @PostMapping("/join")
+    public ResponseEntity<String> join(@RequestBody UserJoinDTO userJoinDTO) throws ExecutionException, InterruptedException {
+        String newUser = testService.userJoin(userJoinDTO);
         return ResponseEntity.ok(newUser);
     }
 

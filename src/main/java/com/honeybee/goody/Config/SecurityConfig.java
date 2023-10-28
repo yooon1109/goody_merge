@@ -2,14 +2,11 @@ package com.honeybee.goody.Config;
 
 import com.honeybee.goody.Jwt.JwtAuthenticationFilter;
 import com.honeybee.goody.Jwt.JwtTokenProvider;
-
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import java.util.Arrays;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -23,23 +20,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableMethodSecurity(securedEnabled = true,prePostEnabled = true)
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
 
+public class SecurityConfig{
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     private CorsConfig corsConfig;
     //TODO : 로그아웃,
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
          http
