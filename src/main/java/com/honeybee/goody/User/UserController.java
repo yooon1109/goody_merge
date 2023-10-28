@@ -1,8 +1,11 @@
 package com.honeybee.goody.User;
 
+import com.honeybee.goody.Contents.ContentsInsertDTO;
 import com.honeybee.goody.Jwt.AuthService;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
+import com.honeybee.goody.Test.Test;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +35,10 @@ UserController {
         return ResponseEntity.ok().headers(httpHeaders).body(token);
     }
 
-//    @Operation(summary = "마이페이지", description = "유저의 마이페이지 첫 화면")
-//    @GetMapping("/userHome")
-//    public Map<String, Object> getCollectionList() throws Exception {
-//        return collectionService.getCollectionList();
+//    @Operation(summary = "회원가입", description = "회원가입")
+//    @PostMapping("/join")
+//    public ResponseEntity<String> join(@RequestBody UserJoinDTO userJoinDTO) throws ExecutionException, InterruptedException {
+//        String newUser = userService.userJoin(userJoinDTO);
+//        return ResponseEntity.ok(newUser);
 //    }
 }
