@@ -5,18 +5,21 @@ import com.google.cloud.firestore.*;
 import com.google.cloud.firestore.Query.Direction;
 import com.honeybee.goody.File.FileService;
 import com.honeybee.goody.User.UserService;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ContentsService {
@@ -35,6 +38,7 @@ public class ContentsService {
     public Map<String,Object> getPreviewContents(String type,int page) throws ExecutionException, InterruptedException {
         //컬렉션참조
         CollectionReference collectionRef = firestore.collection("Contents");//필드를 기준으로 내림차순 정렬
+
         Query query = collectionRef.orderBy("createdDate", Direction.DESCENDING);
 
         int pageSize = 5; // 페이지 크기

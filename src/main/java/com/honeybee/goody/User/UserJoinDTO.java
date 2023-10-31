@@ -1,4 +1,4 @@
-package com.honeybee.goody.Test;
+package com.honeybee.goody.User;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
