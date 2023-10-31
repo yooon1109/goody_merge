@@ -2,6 +2,7 @@ package com.honeybee.goody.Contents;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
+import com.google.cloud.firestore.Query.Direction;
 import com.honeybee.goody.File.FileService;
 import com.honeybee.goody.User.UserService;
 import java.io.IOException;
@@ -34,7 +35,7 @@ public class ContentsService {
     public Map<String,Object> getPreviewContents(String type,int page) throws ExecutionException, InterruptedException {
         //컬렉션참조
         CollectionReference collectionRef = firestore.collection("Contents");//필드를 기준으로 내림차순 정렬
-        Query query = collectionRef.orderBy("createdDate", Query.Direction.ASCENDING);
+        Query query = collectionRef.orderBy("createdDate", Direction.DESCENDING);
 
         int pageSize = 5; // 페이지 크기
 

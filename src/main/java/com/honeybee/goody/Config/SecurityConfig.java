@@ -43,7 +43,7 @@ public class SecurityConfig{
              .sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
              .authorizeHttpRequests((request) -> request
                  .requestMatchers("/user/**","/v3/api-docs/**",
-                     "/swagger-ui/**").permitAll()//해당경로 url은 인증없이 사용가능
+                     "/swagger-ui/**","/ws-stomp/**").permitAll()//해당경로 url은 인증없이 사용가능
                  .anyRequest().authenticated())
              .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
              UsernamePasswordAuthenticationFilter.class)//토큰으로 검사

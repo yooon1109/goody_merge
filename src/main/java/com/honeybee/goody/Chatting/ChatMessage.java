@@ -1,5 +1,6 @@
 package com.honeybee.goody.Chatting;
 
+import java.util.Date;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,5 +17,5 @@ public class ChatMessage {
     private String roomId;// 방 번호
     private String sender;//채팅을 보낸 사람
     private String message;// 메세지
-    private String time; // 채팅 발송 시간
+    private Date time; // 채팅 발송 시간
 }
