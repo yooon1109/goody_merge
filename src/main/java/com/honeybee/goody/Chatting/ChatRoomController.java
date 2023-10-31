@@ -22,14 +22,14 @@ public class ChatRoomController {
     @Operation(summary = "채팅방 목록", description = "")
     @GetMapping("/list")
     public ResponseEntity<List<ChatRoom>> getChatRoomList() throws Exception {
-        return null;
+        return ResponseEntity.ok(chatRoomService.chatRoomList());
     }
 
     @Operation(summary = "채팅방 생성", description = "")
     @PostMapping("/create")
-    public ResponseEntity<ChatRoom> createChatRoom(@RequestParam String roomName,@RequestParam List<String> enterUsers) throws Exception {
+    public ResponseEntity<ChatRoom> createChatRoom(@RequestParam String roomId,@RequestParam List<String> enterUsers) throws Exception {
 
-        return ResponseEntity.ok(chatRoomService.roomCreate(roomName,enterUsers));
+        return ResponseEntity.ok(chatRoomService.roomCreate(roomId,enterUsers));
     }
 
     @Operation(summary = "채팅방 입장", description = "")

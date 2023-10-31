@@ -14,4 +14,5 @@ public class ChatRoom {
     private String roomId;
     private String roomName;
     private List<String> enterUsers;
+    private int messageCnt;
 }
