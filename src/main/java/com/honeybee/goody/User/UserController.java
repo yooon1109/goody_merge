@@ -1,26 +1,27 @@
 package com.honeybee.goody.User;
 
-import com.honeybee.goody.Contents.ContentsInsertDTO;
 import com.honeybee.goody.Jwt.AuthService;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-
-import com.honeybee.goody.Test.Test;
-import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("user")
 @RequiredArgsConstructor
-public class
-UserController {
+public class UserController {
 
     @Autowired
     private final UserService userService;
+    @Autowired
+    private final JoinService joinService;
     @Autowired
     private final AuthService authService;
 
@@ -35,10 +36,9 @@ UserController {
         return ResponseEntity.ok().headers(httpHeaders).body(token);
     }
 
-//    @Operation(summary = "회원가입", description = "회원가입")
-//    @PostMapping("/join")
-//    public ResponseEntity<String> join(@RequestBody UserJoinDTO userJoinDTO) throws ExecutionException, InterruptedException {
-//        String newUser = userService.userJoin(userJoinDTO);
-//        return ResponseEntity.ok(newUser);
-//    }
+    @PostMapping("/join")
+    public ResponseEntity<String> join(@RequestBody UserJoinDTO userJoinDTO) throws InterruptedException, ExecutionException {
+        String newUser = joinService.userJoin(userJoinDTO);
+        return ResponseEntity.ok(newUser);
+    }
 }
