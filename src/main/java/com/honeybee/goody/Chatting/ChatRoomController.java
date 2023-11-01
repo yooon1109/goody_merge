@@ -27,14 +27,16 @@ public class ChatRoomController {
 
     @Operation(summary = "채팅방 생성", description = "")
     @PostMapping("/create")
-    public ResponseEntity<ChatRoom> createChatRoom(@RequestParam String roomId,@RequestParam List<String> enterUsers) throws Exception {
+    public ResponseEntity<ChatRoom> createChatRoom(@Parameter(description = "알아서 규칙적으로 생성해서 보내주기")@RequestParam String roomId,
+                                                   @Parameter(description = "채팅방에 참여한 인원들(판매자+구매자)") @RequestParam List<String> enterUsers,
+                                                   @Parameter(description = "구매하려는 물품의 아이디") @RequestParam String contentId) throws Exception {
 
-        return ResponseEntity.ok(chatRoomService.roomCreate(roomId,enterUsers));
+        return ResponseEntity.ok(chatRoomService.roomCreate(roomId,enterUsers,contentId));
     }
 
-    @Operation(summary = "채팅방 입장", description = "")
-    @PostMapping("/enter")
-    public ResponseEntity<ChatRoom> enterChatRoom(String roomName) throws Exception {
-        return null;
-    }
+//    @Operation(summary = "채팅방 입장", description = "")
+//    @PostMapping("/enter")
+//    public ResponseEntity<ChatRoom> enterChatRoom(String roomName) throws Exception {
+//        return null;
+//    }
 }

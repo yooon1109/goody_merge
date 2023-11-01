@@ -19,12 +19,13 @@ public class ChatRoomService {
 
     private final Firestore firestore;
     private final UserService userService;
-    public ChatRoom roomCreate(String roomId, List<String> enterUsers) throws Exception{
+    public ChatRoom roomCreate(String roomId, List<String> enterUsers,String contentId) throws Exception{
         CollectionReference collectionRef = firestore.collection("Chats");//컬렉션참조
         DocumentReference docRef = collectionRef.document(roomId);//문서아이디지정
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setRoomId(roomId);
         chatRoom.setEnterUsers(enterUsers);
+        chatRoom.setContentsId(contentId);
         chatRoom.setMessageCnt(0);
         docRef.set(chatRoom);
 

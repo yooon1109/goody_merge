@@ -203,6 +203,14 @@ public class ContentsService {
         return result.get().getId();
     }
 
+    //컨텐츠 삭제
+    public String deleteContents(String documentId) throws Exception{
+        CollectionReference collectionRef = firestore.collection("Contents");//컨텐츠 컬렉션
+        ApiFuture<WriteResult> deleteApiFuture = collectionRef.document(documentId).delete();
+
+        return "delete success";
+    }
+
     //컨텐츠 파일 저장 후 저장된 경로 반환
     public List<String> setContentsFilePath(List<MultipartFile> files)
         throws ExecutionException, InterruptedException {
@@ -216,6 +224,7 @@ public class ContentsService {
 
         ).toList();
     }
+
 
     //페이지 그 그거 암튼 추후에 수정 중복되는 코드 수정
 
