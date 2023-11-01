@@ -23,6 +23,10 @@ public class Contents {//게시글 컨텐츠 등록할 데이터들
     private String category;
     //상품 거래종류(같이해요,판매해요,구해요)
     private String transType;
+    //같이해요일 경우(인원수)
+    private Integer numOfPeople;
+    //같이해요일 경우(추가 인원)
+    private List<String> people;
     //상품 등급
     private String grade;
     //게시글 제목

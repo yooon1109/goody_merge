@@ -1,15 +1,16 @@
 package com.honeybee.goody.User;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
 
-@NoArgsConstructor
-@AllArgsConstructor
+
 @Getter
 @Setter
 public class User {
@@ -28,5 +29,5 @@ public class User {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date joinDate;
     private List<String> likes;
-
+    private List<String> chatRooms;
 }

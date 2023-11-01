@@ -34,7 +34,7 @@ public class ChatRoomService {
             DocumentSnapshot documentSnapshot = colRef.whereEqualTo("userId", enterUsers.get(i))
                                                     .get().get().getDocuments().get(0);
             String documentId = documentSnapshot.getId();//문서 아이디
-            colRef.document(documentId).update("ChatRooms", FieldValue.arrayUnion(roomId));
+            colRef.document(documentId).update("chatRooms", FieldValue.arrayUnion(roomId));
         }
         return chatRoom;
     }
@@ -42,7 +42,7 @@ public class ChatRoomService {
     public List<ChatRoom> chatRoomList() throws Exception{
         String userDocumentId = userService.loginUserDocumentId();
         DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
-        Object chatRoom = userDocRef.get().get().get("ChatRooms");
+        Object chatRoom = userDocRef.get().get().get("chatRooms");
         List<String> chatRooms = (List<String>) chatRoom;
         List<ChatRoom> chatRoomList = new ArrayList<>();
         for(String chatRoomId : chatRooms){

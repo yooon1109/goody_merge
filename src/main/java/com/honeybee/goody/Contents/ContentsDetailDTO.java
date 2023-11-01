@@ -16,6 +16,10 @@ public class ContentsDetailDTO {
     private String writerDocumentId;
     //글쓴이 아이디
     private String writerId;
+    //내가 작성한 글인지
+    private boolean myContents;
+    //내가 좋아요 눌렀는지
+    private boolean like;
     //카테고리
     private String category;
     //상품 거래종류
@@ -36,4 +40,5 @@ public class ContentsDetailDTO {
     private String explain;
     //파일
     private List<String> imgPath;
+
 }

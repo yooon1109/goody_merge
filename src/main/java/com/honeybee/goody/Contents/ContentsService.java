@@ -5,8 +5,12 @@ import com.google.cloud.firestore.*;
 import com.google.cloud.firestore.Query.Direction;
 import com.honeybee.goody.File.FileService;
 import com.honeybee.goody.User.UserService;
+import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,17 +26,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ContentsService {
     private final Firestore firestore;
     private final FileService fileService;
     private final UserService userService;
-
-    @Autowired
-    public ContentsService(Firestore firestore, FileService fileService, UserService userService) {
-        this.firestore = firestore;
-        this.fileService = fileService;
-        this.userService = userService;
-    }
 
     //컨텐츠 미리보기
     public Map<String,Object> getPreviewContents(String type,int page) throws ExecutionException, InterruptedException {
@@ -78,9 +76,8 @@ public class ContentsService {
     //컨텐츠 검색
     public List<PreviewDTO> SearchPreviewContents(String search,String category,String transType, Boolean sold) throws ExecutionException, InterruptedException {
         CollectionReference collectionRef = firestore.collection("Contents");
-        Query query = collectionRef;
 
-        //Query query = collectionRef.orderBy("createdDate", Query.Direction.DESCENDING);
+        Query query = collectionRef.orderBy("createdDate", Direction.DESCENDING);
         if(search!=null){
             // 'title' 필드 또는 'explain' 필드에서 검색 후 정렬->title 완전 일치만 검색 가능
             query = query
@@ -115,7 +112,8 @@ public class ContentsService {
                         throw new RuntimeException(e);
                     }
                 }).toList();
-        //총개수 추가하기
+
+        //총개수 추가하기..?
 
         return contents;
 
@@ -141,9 +139,29 @@ public class ContentsService {
                 }
             }).toList();
             contentsDetailDTO.setImgPath(imgPathList);
+            //문서Id로 작성자 아이디찾기
             DocumentSnapshot doc = firestore.collection("Users").document(contents.getWriterId()).get().get();
             contentsDetailDTO.setWriterDocumentId(contents.getWriterId());
             contentsDetailDTO.setWriterId(doc.getString("userId"));
+            // 현재 로그인한 사용자의 정보 가져와서 본인글인지 확인
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String username = userDetails.getUsername();
+            if(contentsDetailDTO.getWriterId().equals(username)){
+                contentsDetailDTO.setMyContents(true);
+            }else{
+                contentsDetailDTO.setMyContents(false);
+            }
+            // 사용자가 좋아요한 글인지 확인
+            String userDocumentId = userService.loginUserDocumentId();
+            DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+            List<String> likes = (List<String>) userDocRef.get().get().get("likes");
+            for(String like : likes){
+                if(like.equals(documentId)){
+                    contentsDetailDTO.setLike(true);
+                }else{
+                    contentsDetailDTO.setLike(false);
+                }
+            }
             return contentsDetailDTO;
         }else{
             return null;
@@ -164,7 +182,8 @@ public class ContentsService {
         // Instant를 Date로 변환
         Date createdDate = java.util.Date.from(instant);
         contents.setCreatedDate(createdDate);//게시글 등록 시간
-        contents.setWriterId(userService.loginUserDocumentId());//로그인한 사람 글쓴이로 저장
+        String userDocumentId = userService.loginUserDocumentId();
+        contents.setWriterId(userDocumentId);//로그인한 사람 글쓴이로 저장
 
         CollectionReference collectionRef =firestore.collection("Contents");//컬렉션참조
         ApiFuture<DocumentReference> result = collectionRef.add(contents);//저장
@@ -180,7 +199,6 @@ public class ContentsService {
             }
             contentsDocRef.update(togetherData);
         }
-
 
         return result.get().getId();
     }
