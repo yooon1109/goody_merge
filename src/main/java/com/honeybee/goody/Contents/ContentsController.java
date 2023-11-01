@@ -1,5 +1,7 @@
 package com.honeybee.goody.Contents;
 
+import com.google.cloud.firestore.WriteResult;
+import com.google.firestore.v1.WriteRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -24,17 +26,7 @@ public class ContentsController {
     public ResponseEntity<Map<String,Object>> postPreview(@Parameter(description = "판매해요,구해요,같이해요") @RequestParam String transType,
                                                           @Parameter(description = "페이지") @RequestParam int page)
         throws ExecutionException, InterruptedException {
-        Map<String,Object> posts = new HashMap<>();
-        posts = contentsService.getPreviewContents(transType,page);
-//        if(transType.equals("판매해요")){
-//            posts = contentsService.getPreviewContents("판매해요",page);
-//        } else if (transType.equals("구해요")) {
-//            posts = contentsService.getPreviewContents("구해요",page);
-//        } else if (transType.equals("같이해요")) {
-//            posts = contentsService.getPreviewContents("같이해요",page);
-//        }else {
-//            return ResponseEntity.badRequest().build();
-//        }
+        Map<String,Object> posts = contentsService.getPreviewContents(transType,page);
         return ResponseEntity.ok(posts);
     }
 
@@ -66,6 +58,11 @@ public class ContentsController {
         return ResponseEntity.ok(postId);
     }
 
+    @Operation(summary = "게시글 삭제", description = "게시글 삭제하기")
+    @DeleteMapping(value = "delete")
+    public ResponseEntity<String> contentDelete(@RequestParam String documentId) throws Exception{
+        return ResponseEntity.ok(contentsService.deleteContents(documentId));
+    }
     @Operation(summary = "게시글 좋아요", description = "게시글 좋아요 버튼")
     @PostMapping("/addlike")
     public ResponseEntity<String> contentsLikes(@Parameter(description = "게시글 documentId") @RequestParam String documentId)
