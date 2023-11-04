@@ -5,6 +5,7 @@ import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,13 +19,10 @@ import java.util.concurrent.ExecutionException;
 
 @Component
 @Service
-
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
-    private final Firestore firestore;
 
-    public UserService(Firestore firestore) {
-        this.firestore = firestore;
-    }
+    private final Firestore firestore;
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
