@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,11 +28,9 @@ public class ChatRoomController {
 
     @Operation(summary = "채팅방 생성", description = "")
     @PostMapping("/create")
-    public ResponseEntity<ChatRoom> createChatRoom(@Parameter(description = "알아서 규칙적으로 생성해서 보내주기")@RequestParam String roomId,
-                                                   @Parameter(description = "채팅방에 참여한 인원들(판매자+구매자)") @RequestParam List<String> enterUsers,
-                                                   @Parameter(description = "구매하려는 물품의 아이디") @RequestParam String contentId) throws Exception {
+    public ResponseEntity<ChatRoom> createChatRoom(@RequestBody ChatRoom chatRoom) throws Exception {
 
-        return ResponseEntity.ok(chatRoomService.roomCreate(roomId,enterUsers,contentId));
+        return ResponseEntity.ok(chatRoomService.roomCreate(chatRoom));
     }
 
 //    @Operation(summary = "채팅방 입장", description = "")
