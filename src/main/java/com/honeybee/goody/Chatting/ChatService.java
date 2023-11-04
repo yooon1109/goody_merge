@@ -4,11 +4,16 @@ import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.honeybee.goody.Contents.Contents;
+import com.honeybee.goody.Contents.PreviewDTO;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -40,4 +45,21 @@ public class ChatService {
         }
         return chatMessageList;
     }
+
+    public PreviewDTO getitemInfo(String contentsId) throws Exception {
+        DocumentReference docRef = firestore.collection("Contents").document(contentsId);//문서
+        Contents contents = docRef.get().get().toObject(Contents.class);
+        ModelMapper modelMapper = new ModelMapper();
+        PreviewDTO previewDTO = modelMapper.map(contents, PreviewDTO.class);
+        previewDTO.setDocumentId(docRef.getId()); // 문서의 ID를 설정
+        try {
+            String encodedURL = URLEncoder.encode(previewDTO.getThumbnailImg(), "UTF-8");
+            previewDTO.setThumbnailImg("https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+encodedURL + "?alt=media&token=");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+
+        return previewDTO;
+    }
+
 }

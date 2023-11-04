@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class User {
     private String nickname;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date birth;
+    private String userPhoneNum;
     private String accountBank;
     private String accountNum;
     private String address;
@@ -30,4 +32,8 @@ public class User {
     private Date joinDate;
     private List<String> likes;
     private List<String> chatRooms;
+    private Map<String,Integer> keywords;
+    private int reviewCnt;
+    private Long sumRate;
+    private double avgRate;
 }
