@@ -2,6 +2,9 @@ package com.honeybee.goody.User;
 
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.Firestore;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +33,13 @@ public class JoinService {
 
         Date currentDate = new Date();
         user.setJoinDate(currentDate);
+
+        Map<String,Integer> keywords = new HashMap<>();
+        for(int i=1;i<=4;i++){
+            keywords.put("good"+i,0);
+            keywords.put("bad"+i,0);
+        }
+        user.setKeywords(keywords);
 
         try {
             //컬렉션참조

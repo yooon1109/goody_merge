@@ -2,26 +2,23 @@ package com.honeybee.goody.User.Review;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "of")
 @Getter
 @Setter
-public class Review {
+public class ReviewReceiveDTO {
 
+    @Schema(description = "리뷰를 받는사람의 아이디")
+    private String reviewerId;
+    @Schema(description = "선택된 키워드들")
+    private List<String> reviewKeywords;
     @Schema(description = "별점")
     private double rating;
-
-    @Schema(description = "받은리뷰개수")
-    private int reviewCnt;
-
-    @Schema(description = "받은리뷰키워드")
-    private Map<String,Integer> keywordsCnt;
-
-    @Schema(description = "전체평점")
-    private double totalRate;
+    @Schema(description = "판매물품")
+    private String contentsId;
 }
