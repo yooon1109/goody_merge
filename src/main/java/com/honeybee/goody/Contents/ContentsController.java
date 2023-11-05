@@ -60,9 +60,11 @@ public class ContentsController {
 
     @Operation(summary = "게시글 삭제", description = "게시글 삭제하기")
     @DeleteMapping(value = "delete")
-    public ResponseEntity<String> contentDelete(@RequestParam String documentId) throws Exception{
+    public ResponseEntity<String> contentDelete(@RequestParam String documentId)
+            throws Exception{
         return ResponseEntity.ok(contentsService.deleteContents(documentId));
     }
+
     @Operation(summary = "게시글 좋아요", description = "게시글 좋아요 버튼")
     @PostMapping("/addlike")
     public ResponseEntity<String> contentsLikes(@Parameter(description = "게시글 documentId") @RequestParam String documentId)

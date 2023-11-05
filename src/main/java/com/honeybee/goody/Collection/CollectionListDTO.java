@@ -12,8 +12,11 @@ import lombok.Setter;
 
 public class CollectionListDTO {
     // 썸네일 이미지
-    private String thumbnail;
+    private String thumbnailPath;
 
     // 컬렉션 아이디
     private String collectionId;
+
+    //작성자 아이디
+    private String userId;
 }

@@ -21,12 +21,21 @@ public class CollectionDetailDTO {
     private String title;
 
     //컬렉션 내용
-    private String content;
+    private String explain;
 
     //컬렉션 작성 날짜
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date createdDate;
 
     // 컬렉션 사진 리스트
-    private List<String> images;
+    private List<String> filePath;
+
+    private String userId;
+
+    private Integer likeCount;
+
+    private boolean isMyCollection;
+
+    private boolean isLiked;
+
 }

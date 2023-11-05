@@ -1,5 +1,6 @@
 package com.honeybee.goody.Collection;
 
+import com.google.api.core.ApiFuture;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.*;
 import com.google.cloud.storage.Blob;
@@ -17,8 +18,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,35 +27,32 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.modelmapper.ModelMapper;
 
+
 @Service
+@RequiredArgsConstructor
 public class CollectionService {
 
     private final Firestore firestore;
     private final UserService userService;
 
-    @Autowired
-    public CollectionService(Firestore firestore, UserService userService) throws ExecutionException, InterruptedException {
-        this.firestore = firestore;
-        this.userService = userService;
-    }
-
+    //컬렉션 상세페이지
     public CollectionDetailDTO getCollectionDetail(String collectionId) throws Exception {
         String userDocumentId = userService.loginUserDocumentId();
-        CollectionReference myCollectionRef = firestore.collection("Users").document(userDocumentId).collection("myCollection");
-        DocumentSnapshot documentSnapshot = myCollectionRef.whereEqualTo("collectionId", collectionId).get().get().getDocuments().get(0);
-
-        ModelMapper modelMapper = new ModelMapper();
+        CollectionReference collectionRef = firestore.collection("Collections");
+        DocumentSnapshot documentSnapshot = collectionRef.document(collectionId).get().get();
 
         if (documentSnapshot.exists()) {
-            CollectionDetailDTO collectionDTO = modelMapper.map(documentSnapshot.getData(), CollectionDetailDTO.class);
+            Collection collection = documentSnapshot.toObject(Collection.class);
+            ModelMapper modelMapper = new ModelMapper();
+            CollectionDetailDTO detailDTO = modelMapper.map(collection, CollectionDetailDTO.class);
 
             // createdDate 필드를 매핑
             com.google.cloud.Timestamp firestoreTimestamp = documentSnapshot.get("createdDate", com.google.cloud.Timestamp.class);
             java.util.Date createdDate = firestoreTimestamp.toDate();
-            collectionDTO.setCreatedDate(createdDate);
+            detailDTO.setCreatedDate(createdDate);
 
             // images를 변환하고 매핑
-            List<String> images = collectionDTO.getImages().stream().map(image -> {
+            List<String> images = detailDTO.getFilePath().stream().map(image -> {
                 try {
                     String encodedURL = URLEncoder.encode(image, "UTF-8");
                     return "https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+ encodedURL + "?alt=media&token=";
@@ -62,56 +60,68 @@ public class CollectionService {
                     throw new RuntimeException(e);
                 }
             }).toList();
-            collectionDTO.setImages(images);
+            detailDTO.setFilePath(images);
 
-            return collectionDTO;
+            detailDTO.setCollectionId(collectionId);
+
+            //내 글인지 확인
+            if(detailDTO.getUserId().equals(userDocumentId)){
+                detailDTO.setMyCollection(true);
+            }
+            else detailDTO.setMyCollection(false);
+
+            //좋아요 했던 컬렉션인지 확인
+            DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+            List<String> likes = (List<String>) userDocRef.get().get().get("collectionLikes");
+            for(String like : likes){
+                if(like.equals(collectionId)){
+                    detailDTO.setLiked(true);
+                }else{
+                    detailDTO.setLiked(false);
+                }
+            }
+
+            return detailDTO;
         } else {
             throw new Exception("없음!!");
         }
     }
-
-    public Map<String,Object> getCollectionList() throws Exception {
+    //유저별 컬렉션 미리보기(리스트)
+    public Map<String, Object> getCollectionList() throws Exception {
         String userDocumentId = userService.loginUserDocumentId();
-        DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
-        List<QueryDocumentSnapshot> documents = userDocRef.collection("myCollection").orderBy("createdDate", Query.Direction.DESCENDING).get().get().getDocuments();
+        CollectionReference collectionRef = firestore.collection("Collections");
+        ApiFuture<QuerySnapshot> querySnapshotFuture = collectionRef.whereEqualTo("userId", userDocumentId).get();
+        QuerySnapshot querySnapshot = querySnapshotFuture.get();
 
+         List<CollectionListDTO> collections = querySnapshot.getDocuments().stream()
+                .map(document->{
+                Collection collection = document.toObject(Collection.class);
+                ModelMapper modelMapper = new ModelMapper();
+                CollectionListDTO listDTO = modelMapper.map(collection, CollectionListDTO.class);
+                listDTO.setCollectionId(document.getId());
 
-        List<CollectionListDTO> dtoList = documents.stream().map(document -> {
-            Map<String, Object> data = document.getData();
-            CollectionListDTO dto = document.toObject(CollectionListDTO.class);
-
-            dto.setCollectionId(data.get("collectionId").toString());
-
-            // 여기에서 "images" 값이 비어있는지 확인, 비어있으면 NULL로 반환, 있으면 URL로 반환
-            List<String> images = (List<String>) data.getOrDefault("images", Collections.emptyList());
-            String thumbnail = !images.isEmpty() ? images.get(0).toString() : "NULL";
-
-            String encodedURL;
-            if (thumbnail.equals("NULL")) {
-                encodedURL = "NULL";
-            }
-            else {
                 try {
-                    encodedURL = URLEncoder.encode(thumbnail, "UTF-8");
-                    dto.setThumbnail("https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/" + encodedURL + "?alt=media&token=");
+                    String encodedURL = URLEncoder.encode(listDTO.getThumbnailPath(), "UTF-8");
+                    listDTO.setThumbnailPath("https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/" + encodedURL + "?alt=media&token=");
                 } catch (UnsupportedEncodingException e) {
                     throw new RuntimeException(e);
                 }
-            }
-                return dto;
+                return listDTO;
             }).toList();
 
         Map<String, Object> response = new HashMap<>();
-        response.put("dto", dtoList);
+        response.put("dto", collections);
         return response;
     }
-
-    public ResponseEntity<String> createCollection(CollectionInputDTO inputData) throws Exception {
+    //컬렉션 작성
+    public ResponseEntity<String> createCollection(CollectionInputDTO collectionInputDTO) throws Exception {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         //도큐먼트 아이디로 유저 컬렉션 정보 가져옴
         String userDocumentId = userService.loginUserDocumentId();
         DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
-        CollectionReference myCollectionRef = userDocRef.collection("myCollection");
+        //컬렉션들
+        CollectionReference collectionRef = firestore.collection("Collections");
+
 
         //유저의 컬렉션카운트 필드 값 가져옴
         Long collectionCnt = userDocRef.get().get().getLong("collectionCnt");
@@ -119,33 +129,45 @@ public class CollectionService {
         Map<String, Object> updates = new HashMap<>();
         updates.put("collectionCnt", (Long)collectionCnt+1);
         userDocRef.update(updates);
-
         long newCollectionCnt = collectionCnt+1;
+
+        ModelMapper modelMapper = new ModelMapper();
+        Collection collection = modelMapper.map(collectionInputDTO, Collection.class);
+        //작성자 아이디 셋
+        collection.setUserId(userDocumentId);
         //작성하는 컬렉션의 컬렉션 아이디 만들어줌
         String newCollectionId = userDetails.getUsername() + "-" + newCollectionCnt;
-        List<String> imageUrls = saveImagesToStorage(newCollectionId, inputData.getImages());
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("collectionId", newCollectionId);
-        data.put("title", inputData.getTitle());
-        data.put("content", inputData.getContent());
-        data.put("images", imageUrls);
+        List<String> imageUrls = saveImagesToStorage(newCollectionId, collectionInputDTO.getFilePath());
+        //사진들 저장
+        collection.setFilePath(imageUrls);
+        collection.setThumbnailPath(imageUrls.get(0));
+        //라이크카운트
+        collection.setLikeCount(0);
+        //작성날짜 셋
         LocalDateTime now = LocalDateTime.now();
-
         ZoneId zoneId = ZoneId.systemDefault();
         Instant instant = now.atZone(zoneId).toInstant();
         Date date = Date.from(instant);
-
         Timestamp firestoreTimestamp = Timestamp.of(date);
         Date createdDate = firestoreTimestamp.toDate();
-        data.put("createdDate", createdDate);
+        collection.setCreatedDate(createdDate);
 
-        myCollectionRef.add(data);
+        //컬렉션테이블에 추가
+        DocumentReference docRef = collectionRef.add(collection).get();
+
+        // 방금 저장한 도큐먼트의 아이디 가져오기
+        String documentId = docRef.getId();
+        //유저의 컬렉션 아이디 필드에 추가해주기
+        List<Object> userCollectionId = (List<Object>) userDocRef.get().get().get("userCollectionId");
+        userCollectionId.add(documentId);
+
+        Map<String, Object> collectionIdAdd = new HashMap<>();
+        collectionIdAdd.put("userCollectionId", userCollectionId);
+        userDocRef.update(collectionIdAdd);
 
         return ResponseEntity.ok("잘 됨!");
-
-
     }
+    //이미지 저장
     private List<String> saveImagesToStorage(String collectionId, List<MultipartFile> images) {
         List<String> imageUrls = new ArrayList<>();
         try {
@@ -166,6 +188,79 @@ public class CollectionService {
 
         return imageUrls;
     }
+   //컬렉션 삭제
+    public ResponseEntity<String> deleteMyCollection(String collectionId) throws Exception{
+        CollectionReference collectionRef = firestore.collection("Collections");
+        ApiFuture<WriteResult> deleteApiFuture = collectionRef.document(collectionId).delete();
 
+        //도큐먼트 아이디로 유저 컬렉션 정보 가져옴
+        String userDocumentId = userService.loginUserDocumentId();
+        DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+
+        List<Object> userCollectionId = (List<Object>) userDocRef.get().get().get("userCollectionId");
+        userCollectionId.remove(collectionId);
+
+        // 업데이트된 likes 배열을 저장
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("likes", userCollectionId);
+        userDocRef.update(updates);
+
+        return ResponseEntity.ok("삭제 성공");
+    }
+    //컬렉션 검색
+    public Map<String, Object>  searchCollection(String hashTag1, String hashTag2, String hashTag3) throws Exception{
+        String userDocumentId = userService.loginUserDocumentId();
+        CollectionReference collectionRef = firestore.collection("Collections");
+
+        Set<String> documentIds = new HashSet<>(); // 얘는 중복 허용 안함 & 해시태그 일치하는 도큐먼트 아이디 모을 리스트
+
+        // 해시태그1에 대한 쿼리
+        QuerySnapshot querySnapshot1 = collectionRef.whereArrayContains("hashTags", hashTag1).get().get();
+        for (DocumentSnapshot document : querySnapshot1.getDocuments()) {
+            documentIds.add(document.getId());
+        }
+
+        // 해시태그2 있으면 쿼리 실행
+        if (hashTag2 != null && !hashTag2.trim().isEmpty()) {
+            QuerySnapshot querySnapshot2 = collectionRef.whereArrayContains("hashTags", hashTag2).get().get();
+            for (DocumentSnapshot document : querySnapshot2.getDocuments()) {
+                documentIds.add(document.getId());
+            }
+        }
+
+        // 해시태그3이 있으면 쿼리 실행
+        if (hashTag3 != null && !hashTag3.trim().isEmpty()) {
+            QuerySnapshot querySnapshot3 = collectionRef.whereArrayContains("hashTags", hashTag3).get().get();
+            for (DocumentSnapshot document : querySnapshot3.getDocuments()) {
+                documentIds.add(document.getId());
+            }
+        }
+
+        //가져온 도큐먼트 아이디들과 일치하는 컬렉션들 정보 가져옴
+        List<CollectionListDTO> collections = new ArrayList<>();
+        for (String documentId : documentIds) {
+            // 문서 ID로 문서 정보 조회
+            DocumentSnapshot document = collectionRef.document(documentId).get().get();
+            if (document.exists()) {
+                ModelMapper modelMapper = new ModelMapper();
+                Collection collection = document.toObject(Collection.class);
+                CollectionListDTO listDTO = modelMapper.map(collection, CollectionListDTO.class);
+                listDTO.setCollectionId(document.getId());
+
+                // 썸네일 URL 인코딩
+                try {
+                    String encodedURL = URLEncoder.encode(listDTO.getThumbnailPath(), "UTF-8");
+                    listDTO.setThumbnailPath("https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/" + encodedURL + "?alt=media&token=");
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                }
+                collections.add(listDTO);
+            }
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("collections", collections);
+        return response;
+    }
 
 }
