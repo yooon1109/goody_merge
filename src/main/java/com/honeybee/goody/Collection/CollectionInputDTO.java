@@ -14,6 +14,8 @@ import java.util.List;
 @Setter
 public class CollectionInputDTO {
     private String title;
-    private String content;
-    private List<MultipartFile> images;
+    private String explain;
+    private List<MultipartFile> filePath;
+    private List<String> hashTags;
+
 }
