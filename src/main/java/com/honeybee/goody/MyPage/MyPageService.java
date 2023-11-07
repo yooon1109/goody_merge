@@ -2,6 +2,8 @@ package com.honeybee.goody.MyPage;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
+import com.honeybee.goody.Collection.Collection;
+import com.honeybee.goody.Collection.CollectionListDTO;
 import com.honeybee.goody.Contents.Contents;
 import com.honeybee.goody.Contents.PreviewDTO;
 import com.honeybee.goody.User.UserService;
@@ -56,14 +58,14 @@ public class MyPageService {
         }
     }
 
-    public Map<String,Object> getMyPageLikesPreview() throws Exception {
+    public Map<String,Object> getMyPageContentsLikesPreview() throws Exception {
         String userDocumentId = userService.loginUserDocumentId();
         DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
-        List<Object> likes = (List<Object>) userDocRef.get().get().get("likes");
+        DocumentSnapshot userDocSnapshot = userDocRef.get().get();
 
-        //컬렉션참조
         CollectionReference contentsRef = firestore.collection("Contents");
 
+        List<String> likes = (List<String>) userDocSnapshot.get("contentsLikes");
         ModelMapper modelMapper = new ModelMapper();
 
         List<LikesPreviewDTO> likesPreviewList = likes.stream()
@@ -98,5 +100,4 @@ public class MyPageService {
 
         return likesPreview;
     }
-
 }

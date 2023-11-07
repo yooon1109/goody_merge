@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -261,6 +262,41 @@ public class CollectionService {
         Map<String, Object> response = new HashMap<>();
         response.put("collections", collections);
         return response;
+    }
+    //컬렉션 팔아주세요 등록
+    public String addCollectionLike(String documentId)throws ExecutionException,InterruptedException{
+        String userDocumentId = userService.loginUserDocumentId();
+        DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+
+        List<Object> likes = (List<Object>) userDocRef.get().get().get("collectionLikes");
+
+        likes.add(documentId);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("collectionLikes", likes);
+        userDocRef.update(updates);
+
+        return documentId;
+
+    }
+    //컬렉션 팔아주세요 취소
+    public String removeCollectionLike(String documentId)throws ExecutionException,InterruptedException{
+        String userDocumentId = userService.loginUserDocumentId();
+        DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+
+        //likes 필드 배열
+        DocumentSnapshot userDocSnapshot = userDocRef.get().get();
+        List<Object> likes = (List<Object>) userDocSnapshot.get("collectionLikes");
+
+        likes.remove(documentId);
+
+        // 업데이트된 likes 배열을 저장
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("collectionLikes", likes);
+        userDocRef.update(updates);
+
+        return documentId;
+
     }
 
 }

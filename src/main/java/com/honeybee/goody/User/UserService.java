@@ -69,15 +69,4 @@ public class UserService implements UserDetailsService {
 
     }
 
-    //회원가입
-//    public String userJoin(UserJoinDTO userJoinDTO) throws ExecutionException, InterruptedException {
-//
-//        String encodedPassword = passwordEncoder.encode(userJoinDTO.getUserPw());
-//        userJoinDTO.setUserPw(encodedPassword);
-//
-//        //컬렉션참조
-//        CollectionReference collectionRef = firestore.collection("Users");
-//        ApiFuture<DocumentReference> result = collectionRef.add(userJoinDTO);
-//        return userJoinDTO.getUserId()+"성공";
-//    }
 }

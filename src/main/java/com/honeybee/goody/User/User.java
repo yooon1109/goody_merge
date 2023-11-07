@@ -30,10 +30,13 @@ public class User {
     private String grade;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date joinDate;
-    private List<String> likes;
+    private List<String> contentsLikes;
     private List<String> chatRooms;
     private Map<String,Integer> keywords;
     private int reviewCnt;
     private Long sumRate;
     private double avgRate;
+    private List<String> collectionLikes;
+    private List<String> userCollectionId;
+
 }

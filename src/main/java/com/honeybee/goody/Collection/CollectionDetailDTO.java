@@ -38,4 +38,6 @@ public class CollectionDetailDTO {
 
     private boolean isLiked;
 
+    //해쉬태크
+    private List<String> hashTags;
 }
