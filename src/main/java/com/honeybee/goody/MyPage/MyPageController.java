@@ -27,9 +27,9 @@ public class MyPageController {
 
     @Operation(summary = "마이페이지 찜목록", description = "유저의 마이페이지 찜 목록 리스트")
     @GetMapping("/likesPreview")
-    public ResponseEntity<Map<String,Object>> getLikesPreview() throws Exception {
+    public ResponseEntity<Map<String,Object>> getContentsLikesPreview() throws Exception {
 
-        Map<String,Object> contents = myPageService.getMyPageLikesPreview();
+        Map<String,Object> contents = myPageService.getMyPageContentsLikesPreview();
 
         return ResponseEntity.ok(contents);
 

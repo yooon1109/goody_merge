@@ -233,12 +233,12 @@ public class ContentsService {
         String userDocumentId = userService.loginUserDocumentId();
         DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
 
-        List<Object> likes = (List<Object>) userDocRef.get().get().get("likes");
+        List<Object> likes = (List<Object>) userDocRef.get().get().get("contentsLikes");
 
         likes.add(documentId);
 
         Map<String, Object> updates = new HashMap<>();
-        updates.put("likes", likes);
+        updates.put("contentsLikes", likes);
         userDocRef.update(updates);
 
         return documentId;
@@ -252,13 +252,13 @@ public class ContentsService {
 
         //likes 필드 배열
         DocumentSnapshot userDocSnapshot = userDocRef.get().get();
-        List<Object> likes = (List<Object>) userDocSnapshot.get("likes");
+        List<Object> likes = (List<Object>) userDocSnapshot.get("contentsLikes");
 
         likes.remove(documentId);
 
         // 업데이트된 likes 배열을 저장
         Map<String, Object> updates = new HashMap<>();
-        updates.put("likes", likes);
+        updates.put("contentsLikes", likes);
         userDocRef.update(updates);
 
         return documentId;

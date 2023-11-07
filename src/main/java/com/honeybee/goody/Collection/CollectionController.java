@@ -1,13 +1,9 @@
 package com.honeybee.goody.Collection;
 
-import com.honeybee.goody.Contents.PreviewDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -54,4 +50,23 @@ public class CollectionController {
         Map<String,Object> tags = collectionService.searchCollection(hashTag1,hashTag2,hashTag3);
         return ResponseEntity.ok(tags);
     }
+
+    @Operation(summary = "컬렉션 팔아주세요", description = "컬렉션 팔아주세요 버튼")
+    @PostMapping("/addCollectionLike")
+    public ResponseEntity<String> collectionLikes(@Parameter(description = "게시글 documentId") @RequestParam String documentId)
+            throws ExecutionException, InterruptedException {
+
+        String id = collectionService.addCollectionLike(documentId);
+        return ResponseEntity.ok(id);
+    }
+
+    @Operation(summary = "컬렉션 팔아주세요 취소", description = "컬렉션 팔아주세요 취소")
+    @PostMapping("/removeCollectionLike")
+    public ResponseEntity<String> removeLike(@Parameter(description = "게시글 documentId") @RequestParam String documentId)
+            throws ExecutionException, InterruptedException {
+
+        String id = collectionService.removeCollectionLike(documentId);
+        return ResponseEntity.ok(id);
+    }
+
 }

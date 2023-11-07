@@ -13,7 +13,7 @@ import java.util.Date;
 @AllArgsConstructor(staticName = "of")
 @Getter
 @Setter
-public class LikesPreviewDTO { //게시글 미리보기(썸네일)에 필요한 데이터들만
+public class LikesPreviewDTO {
 
     private String documentId;
 
@@ -21,7 +21,7 @@ public class LikesPreviewDTO { //게시글 미리보기(썸네일)에 필요한 
 
     private String transType;
 
-    private int price;
+    private Integer price;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date createdDate;
