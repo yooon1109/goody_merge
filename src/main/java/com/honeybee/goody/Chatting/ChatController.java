@@ -33,7 +33,7 @@ public class ChatController {
 
     @Operation(summary = "채팅방 이전 메시지", description = "")
     @GetMapping("/messages")
-    public ResponseEntity<List<Map<Integer,ChatMessage>>> allMessages(@RequestParam String roomId) throws Exception {
+    public ResponseEntity<Map<Integer,ChatMessage>> allMessages(@RequestParam String roomId) throws Exception {
         return ResponseEntity.ok(chatService.allChatMessage(roomId));
     }
 
