@@ -129,6 +129,7 @@ public class ContentsService {
             Contents contents = documentSnapshot.toObject(Contents.class);
             ModelMapper modelMapper = new ModelMapper();
             ContentsDetailDTO contentsDetailDTO = modelMapper.map(contents, ContentsDetailDTO.class);
+            contentsDetailDTO.setLike(false);
             List<String> imgPathList = contentsDetailDTO.getImgPath().stream().map(img->{
                 try {
                     String encodedURL = URLEncoder.encode(img, "UTF-8");
@@ -154,14 +155,15 @@ public class ContentsService {
             // 사용자가 좋아요한 글인지 확인
             String userDocumentId = userService.loginUserDocumentId();
             DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
-            List<String> likes = (List<String>) userDocRef.get().get().get("likes");
-            for(String like : likes){
-                if(like.equals(documentId)){
-                    contentsDetailDTO.setLike(true);
-                }else{
-                    contentsDetailDTO.setLike(false);
+            List<String> likes = (List<String>) userDocRef.get().get().get("contentsLikes");
+            if(!likes.isEmpty()){
+                for(String like : likes){
+                    if(like.equals(documentId)){
+                        contentsDetailDTO.setLike(true);
+                    }
                 }
             }
+
             return contentsDetailDTO;
         }else{
             return null;
