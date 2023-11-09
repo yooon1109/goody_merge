@@ -1,16 +1,9 @@
 package com.honeybee.goody.MyPage;
 
-import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
-import com.honeybee.goody.Collection.Collection;
-import com.honeybee.goody.Collection.CollectionListDTO;
-import com.honeybee.goody.Contents.Contents;
-import com.honeybee.goody.Contents.PreviewDTO;
 import com.honeybee.goody.User.UserService;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -107,7 +100,6 @@ public class MyPageService {
                 .filter(likesPreviewDTO -> likesPreviewDTO != null) // null 값 필터링
                 .collect(Collectors.toList());
 
-        // LikesPreviewDTO 객체 리스트를 맵으로 반환
         Map<String, Object> likesPreview = Map.of("likedPreviews", likesPreviewList);
 
         return likesPreview;

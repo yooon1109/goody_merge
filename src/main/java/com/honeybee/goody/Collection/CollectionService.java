@@ -37,10 +37,10 @@ public class CollectionService {
     private final UserService userService;
 
     //컬렉션 상세페이지
-    public CollectionDetailDTO getCollectionDetail(String collectionId) throws Exception {
+    public CollectionDetailDTO getCollectionDetail(String documentId) throws Exception {
         String userDocumentId = userService.loginUserDocumentId();
         CollectionReference collectionRef = firestore.collection("Collections");
-        DocumentSnapshot documentSnapshot = collectionRef.document(collectionId).get().get();
+        DocumentSnapshot documentSnapshot = collectionRef.document(documentId).get().get();
 
         if (documentSnapshot.exists()) {
             Collection collection = documentSnapshot.toObject(Collection.class);
@@ -63,7 +63,7 @@ public class CollectionService {
             }).toList();
             detailDTO.setFilePath(images);
 
-            detailDTO.setCollectionId(collectionId);
+            detailDTO.setCollectionId(documentId);
 
             //내 글인지 확인
             if(detailDTO.getUserId().equals(userDocumentId)){
@@ -75,7 +75,7 @@ public class CollectionService {
             DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
             List<String> likes = (List<String>) userDocRef.get().get().get("collectionLikes");
             for(String like : likes){
-                if(like.equals(collectionId)){
+                if(like.equals(documentId)){
                     detailDTO.setLiked(true);
                 }else{
                     detailDTO.setLiked(false);
@@ -268,15 +268,25 @@ public class CollectionService {
         String userDocumentId = userService.loginUserDocumentId();
         DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
 
-        List<Object> likes = (List<Object>) userDocRef.get().get().get("collectionLikes");
+        List<String> userCollectionLikes = (List<String>) userDocRef.get().get().get("collectionLikes");
+        userCollectionLikes.add(documentId);
+        Map<String, Object> userUpdates = new HashMap<>();
+        userUpdates.put("collectionLikes", userCollectionLikes);
+        userDocRef.update(userUpdates);
 
-        likes.add(documentId);
 
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("collectionLikes", likes);
-        userDocRef.update(updates);
+        //컬렉션 정보 가져오기
+        DocumentReference collectionDocRef = firestore.collection("Collections").document(documentId);
+        //컬렉션의 좋아요 개수 가져오기
+        Long collectionLikeCnt = (Long) collectionDocRef.get().get().getLong("likeCount");
+        //좋아요 개수 증가해서 넣어주기
+        Map<String, Object> likesUpdate = new HashMap<>();
+        likesUpdate.put("likeCount", (Long)collectionLikeCnt+1);
+        collectionDocRef.update(likesUpdate);
+        String updateCnt = String.valueOf(collectionLikeCnt+1);     //우선 ㅜㅅㅜ
 
-        return documentId;
+
+        return updateCnt;
 
     }
     //컬렉션 팔아주세요 취소
@@ -295,7 +305,19 @@ public class CollectionService {
         updates.put("collectionLikes", likes);
         userDocRef.update(updates);
 
-        return documentId;
+        DocumentReference collectionDocRef = firestore.collection("Collections").document(documentId);
+
+        //컬렉션의 좋아요 개수 가져오기
+        Long collectionLikeCnt = (Long) collectionDocRef.get().get().getLong("likeCount");
+
+        //좋아요 개수 증가해서 넣어주기
+        Map<String, Object> likesUpdate = new HashMap<>();
+        likesUpdate.put("likeCount", (Long)collectionLikeCnt-1);
+        collectionDocRef.update(likesUpdate);
+
+        String updateCnt = String.valueOf(collectionLikeCnt-1);
+
+        return updateCnt;
 
     }
 
