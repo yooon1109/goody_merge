@@ -20,7 +20,7 @@ public class ReviewController {
     @Operation(summary = "리뷰 키워드 저장", description = "선택된 키워드들을 리스트로 전송")
     @PostMapping("/keywords")
     public ResponseEntity<String> saveReviewKeywords(@RequestBody ReviewReceiveDTO review
-                                                    ,@Parameter(description = "리뷰를 받는 사람 문서아이디") @RequestParam String receiveId)
+                                                    ,@Parameter(description = "리뷰를 받는 사람 아이디") @RequestParam String receiveId)
         throws Exception{
         String documentId = reviewService.saveReviewKeywords(review,receiveId);
         return ResponseEntity.ok(documentId);
@@ -30,7 +30,7 @@ public class ReviewController {
     @PostMapping("/rate")
     public ResponseEntity<String> saveReviewRate(@Parameter(description = "키워드저장하고 받은 문서아이디")@RequestParam String reviewDocumentId,
                                                  @Parameter(description = "리뷰를 받는 사람")@RequestParam String receiveId,
-                                                 @Parameter(description = "별점")@RequestParam Double rate) throws Exception{
+                                                 @Parameter(description = "별점")@RequestParam Long rate) throws Exception{
         reviewService.saveReviewRate(reviewDocumentId,receiveId,rate);
         return ResponseEntity.ok("ok");
     }
