@@ -68,6 +68,18 @@ public class MyPageService {
         List<String> likes = (List<String>) userDocSnapshot.get("contentsLikes");
         ModelMapper modelMapper = new ModelMapper();
 
+        likes = likes.stream()
+                .map(Object::toString)
+                .filter(documentId -> {
+                    DocumentReference contentDocRef = contentsRef.document(documentId);
+                    try {
+                        return contentDocRef.get().get().exists();
+                    } catch (InterruptedException | ExecutionException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
+        userDocRef.update("contentsLikes",likes);
         List<LikesPreviewDTO> likesPreviewList = likes.stream()
                 .map(Object::toString)
                 .map(documentId -> {

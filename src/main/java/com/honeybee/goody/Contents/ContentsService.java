@@ -156,7 +156,7 @@ public class ContentsService {
             String userDocumentId = userService.loginUserDocumentId();
             DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
             List<String> likes = (List<String>) userDocRef.get().get().get("contentsLikes");
-            if(!likes.isEmpty()){
+            if(likes!=null){
                 for(String like : likes){
                     if(like.equals(documentId)){
                         contentsDetailDTO.setLike(true);

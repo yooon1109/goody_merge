@@ -5,6 +5,8 @@ import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.honeybee.goody.User.UserService;
+
+import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,14 +20,15 @@ public class ReviewService {
     private final UserService userService;
 
     public String saveReviewKeywords(ReviewReceiveDTO review,String receiveId) throws Exception{
-        DocumentReference docRef = firestore.collection("Users").document(receiveId);//유저 문서
+        DocumentReference docRef = firestore.collection("Users").whereEqualTo("userId",receiveId).get().get().getDocuments().get(0).getReference();//유저 문서
         CollectionReference subCollectionRef = docRef.collection("Review");//리뷰 서브 컬렉션
         review.setReviewerId(userService.loginUserDocumentId());
         ApiFuture<DocumentReference> result = subCollectionRef.add(review);
         String reviewId = result.get().getId();
         //키워드 카운트
         Map<String,Long> keywords = (Map<String, Long>) docRef.get().get().get("keywords");
-        if(keywords.isEmpty()){
+        if(keywords==null){
+            keywords = new HashMap<>();
             for(int i=1;i<=4;i++){
                 keywords.put("good"+i, 0L);
                 keywords.put("bad"+i,0L);
@@ -50,13 +53,13 @@ public class ReviewService {
         return reviewId;
     }
 
-    public ReviewReceiveDTO saveReviewRate(String reviewDocumentId,String receiveId,Double rate) throws Exception{
-        DocumentReference docRef = firestore.collection("Users").document(receiveId);//유저 문서
+    public ReviewReceiveDTO saveReviewRate(String reviewDocumentId,String receiveId,Long rate) throws Exception{
+        DocumentReference docRef = firestore.collection("Users").whereEqualTo("userId",receiveId).get().get().getDocuments().get(0).getReference();//유저 문서
         DocumentReference reviewDocRef = docRef.collection("Review").document(reviewDocumentId);//리뷰 서브 컬렉션 문서
         reviewDocRef.update("rating",rate);
 
         //별점 총점
-        Double sumRate = (Double) docRef.get().get().get("sumRate");
+        Long sumRate = (Long) docRef.get().get().get("sumRate");
         if(sumRate!=null){
             sumRate+=rate;
         }else{
@@ -78,7 +81,7 @@ public class ReviewService {
             }
         }
         System.out.println(totalKey);
-        Double avgRate = (totalKey+sumRate)/reviewCnt;
+        Double avgRate = (double) ((totalKey+sumRate)/reviewCnt);
         docRef.update("avgRate",avgRate);
         return reviewDocRef.get().get().toObject(ReviewReceiveDTO.class);
     }

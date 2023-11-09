@@ -20,7 +20,6 @@ public class ChatRoomService {
     public ChatRoom roomCreate(ChatRoom chatRoom) throws Exception{
         CollectionReference collectionRef = firestore.collection("Chats");//컬렉션참조
         DocumentReference docRef = collectionRef.document(chatRoom.getRoomId());//문서아이디지정
-
         chatRoom.setMessageCnt(0);
         docRef.set(chatRoom);
 
