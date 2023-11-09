@@ -42,4 +42,6 @@ public class Collection {
     //해쉬태크
     private List<String> hashTags;
 
+    private List<String> collectionLikesUserId;
+
 }

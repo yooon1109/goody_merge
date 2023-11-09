@@ -227,9 +227,6 @@ public class ContentsService {
         ).toList();
     }
 
-
-    //페이지 그 그거 암튼 추후에 수정 중복되는 코드 수정
-
     //좋아요 등록
     public String addContentsLike(String documentId)throws ExecutionException,InterruptedException{
         String userDocumentId = userService.loginUserDocumentId();
