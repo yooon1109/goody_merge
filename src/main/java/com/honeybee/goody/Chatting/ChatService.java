@@ -31,19 +31,20 @@ public class ChatService {
         return subCollectionRef.getId();
     }
 
-    public Map<Integer,ChatMessage> allChatMessage(String roomId) throws Exception{
+    public List<ChatMessage> allChatMessage(String roomId) throws Exception{
         DocumentReference docRef = firestore.collection("Chats").document(roomId);//문서
         Long messageCnt = (Long) docRef.get().get().get("messageCnt");
         CollectionReference subCollectionRef = docRef.collection("Messages");
-        Map<Integer,ChatMessage> chatMessageMap = new HashMap<>();
-//        List<Map<Integer,ChatMessage>> chatMessageList = new ArrayList<>();
+        List<ChatMessage> chatMessageList = new ArrayList<>();
+
         for(int i=1;i<=messageCnt;i++){
             DocumentSnapshot documentSnapshot = subCollectionRef.document(String.valueOf(i)).get().get();
             ChatMessage chatMessage = documentSnapshot.toObject(ChatMessage.class);
-            chatMessageMap.put(i,chatMessage);
-//            chatMessageList.add(chatMessageMap);
+            if(chatMessage!=null){
+                chatMessageList.add(chatMessage);
+            }
         }
-        return chatMessageMap;
+        return chatMessageList;
     }
 
     public PreviewDTO getitemInfo(String contentsId) throws Exception {
