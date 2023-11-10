@@ -35,7 +35,7 @@ public class JoinService {
         user.setJoinDate(currentDate);
 
         Map<String,Integer> keywords = new HashMap<>();
-        for(int i=1;i<=4;i++){
+        for(int i=1;i<=6;i++){
             keywords.put("good"+i,0);
             keywords.put("bad"+i,0);
         }

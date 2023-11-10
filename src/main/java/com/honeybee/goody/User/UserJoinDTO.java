@@ -25,4 +25,6 @@ public class UserJoinDTO {
 
     private String userPhoneNum;
 
+    private String nickname;
+
 }

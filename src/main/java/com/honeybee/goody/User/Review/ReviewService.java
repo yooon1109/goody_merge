@@ -27,9 +27,9 @@ public class ReviewService {
         String reviewId = result.get().getId();
         //키워드 카운트
         Map<String,Long> keywords = (Map<String, Long>) docRef.get().get().get("keywords");
-        if(keywords==null){
+        if(keywords==null||keywords.size()<=6){
             keywords = new HashMap<>();
-            for(int i=1;i<=4;i++){
+            for(int i=1;i<=6;i++){
                 keywords.put("good"+i, 0L);
                 keywords.put("bad"+i,0L);
             }
