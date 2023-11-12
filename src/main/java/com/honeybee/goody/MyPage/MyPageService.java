@@ -1,39 +1,39 @@
 package com.honeybee.goody.MyPage;
 
 import com.google.cloud.firestore.*;
+import com.honeybee.goody.Collection.Collection;
+import com.honeybee.goody.Collection.CollectionListDTO;
+import com.honeybee.goody.Contents.Contents;
+import com.honeybee.goody.Contents.PreviewDTO;
 import com.honeybee.goody.User.UserService;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.modelmapper.ModelMapper;
+
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.Date;
-import java.util.stream.Collectors;
+
 
 @Service
+@RequiredArgsConstructor
 public class MyPageService {
     private final Firestore firestore;
     private final UserService userService;
 
-    @Autowired
-    public MyPageService(Firestore firestore, UserService userService) throws ExecutionException, InterruptedException {
-        this.firestore = firestore;
-        this.userService = userService;
-    }
 
     public MyPageHomeDTO getMyPageHome() throws Exception{
         String userDocumentId = userService.loginUserDocumentId();
         DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
         DocumentSnapshot userDocSnapshot = userDocRef.get().get();
 
-        ModelMapper modelMapper = new ModelMapper();
-
         if (userDocSnapshot.exists()) {
-            MyPageHomeDTO dto = modelMapper.map(userDocSnapshot.getData(), MyPageHomeDTO.class);
+            MyPage myPage = userDocSnapshot.toObject(MyPage.class);
+            ModelMapper modelMapper = new ModelMapper();
+            MyPageHomeDTO dto = modelMapper.map(myPage, MyPageHomeDTO.class);
+
             // createdDate 필드를 매핑
             com.google.cloud.Timestamp firestoreTimestamp = userDocSnapshot.get("joinDate", com.google.cloud.Timestamp.class);
             java.util.Date joinDate = firestoreTimestamp.toDate();
@@ -51,7 +51,7 @@ public class MyPageService {
         }
     }
 
-    public Map<String,Object> getMyPageContentsLikesPreview() throws Exception {
+    public Map<String,Object> getContentsLikePreview() throws Exception {
         String userDocumentId = userService.loginUserDocumentId();
         DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
         DocumentSnapshot userDocSnapshot = userDocRef.get().get();
@@ -59,49 +59,128 @@ public class MyPageService {
         CollectionReference contentsRef = firestore.collection("Contents");
 
         List<String> likes = (List<String>) userDocSnapshot.get("contentsLikes");
-        ModelMapper modelMapper = new ModelMapper();
+        Map<String, Object> result = new HashMap<>();
 
-        likes = likes.stream()
-                .map(Object::toString)
-                .filter(documentId -> {
-                    DocumentReference contentDocRef = contentsRef.document(documentId);
-                    try {
-                        return contentDocRef.get().get().exists();
-                    } catch (InterruptedException | ExecutionException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .collect(Collectors.toList());
-        userDocRef.update("contentsLikes",likes);
-        List<LikesPreviewDTO> likesPreviewList = likes.stream()
-                .map(Object::toString)
-                .map(documentId -> {
-                    // Contents 컬렉션에서 documentId와 일치하는 도큐먼트를 찾음
-                    DocumentReference contentDocRef = contentsRef.document(documentId);
-                    try {
-                        if (contentDocRef.get().get().exists()) {
-                            // documentId와 일치하는 도큐먼트가 있을 경우, 해당 도큐먼트를 LikesPreviewDTO로 매핑
-                            LikesPreviewDTO likesPreviewDTO = modelMapper.map(contentDocRef.get().get().getData(), LikesPreviewDTO.class);
-                            likesPreviewDTO.setDocumentId(documentId);
 
-                            try {
-                                String encodedURL = URLEncoder.encode(likesPreviewDTO.getThumbnailImg(), "UTF-8");
-                                likesPreviewDTO.setThumbnailImg("https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+encodedURL + "?alt=media&token=");
-                            } catch (UnsupportedEncodingException e) {
-                                throw new RuntimeException(e);
-                            }
-                            return likesPreviewDTO;
+        if (likes == null || likes.isEmpty()) {
+            result.put("dto", "Null");
+        }
+        else {
+            //가져온 도큐먼트 아이디들과 일치하는 컬렉션들 정보 가져옴
+            List<PreviewDTO> contents = new ArrayList<>();
+
+            for (String like : likes) {
+                try {
+                    DocumentSnapshot document = contentsRef.document(like).get().get();
+                    if (document.exists()) {
+                        ModelMapper modelMapper = new ModelMapper();
+                        Contents content = document.toObject(Contents.class);
+                        PreviewDTO previewDTO = modelMapper.map(content, PreviewDTO.class);
+                        previewDTO.setDocumentId(document.getId());
+
+                        try {
+                            String encodedURL = URLEncoder.encode(previewDTO.getThumbnailImg(), "UTF-8");
+                            previewDTO.setThumbnailImg("https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/" + encodedURL + "?alt=media&token=");
+                        } catch (UnsupportedEncodingException e) {
+                            // URL 인코딩 예외 처리
+                            throw new RuntimeException(e);
                         }
-                    } catch (InterruptedException | ExecutionException e) {
-                        throw new RuntimeException(e);
+                        contents.add(previewDTO);
                     }
-                    return null; // 일치하는 도큐먼트가 없을 경우 null 반환
-                })
-                .filter(likesPreviewDTO -> likesPreviewDTO != null) // null 값 필터링
-                .collect(Collectors.toList());
+                }catch (InterruptedException | ExecutionException e){}
+            }
 
-        Map<String, Object> likesPreview = Map.of("likedPreviews", likesPreviewList);
-
-        return likesPreview;
+            result.put("dto", contents);
+        }
+        return result;
     }
+
+    public Map<String,Object> getCollectionLikePreview() throws Exception {
+        String userDocumentId = userService.loginUserDocumentId();
+        DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+        DocumentSnapshot userDocSnapshot = userDocRef.get().get();
+
+        CollectionReference contentsRef = firestore.collection("Collections");
+
+        List<String> likes = (List<String>) userDocSnapshot.get("collectionLikes");
+        Map<String, Object> result = new HashMap<>();
+
+
+        if (likes == null || likes.isEmpty()) {
+            result.put("collectionLikes", "Null");
+        }
+        else {
+            //가져온 도큐먼트 아이디들과 일치하는 컬렉션들 정보 가져옴
+            List<CollectionListDTO> collections = new ArrayList<>();
+
+            for (String like : likes) {
+                try {
+                    // 문서 ID로 문서 정보 조회
+                    DocumentSnapshot document = contentsRef.document(like).get().get();
+                    ModelMapper modelMapper = new ModelMapper();
+                    Collection collection = document.toObject(Collection.class);
+                    CollectionListDTO dto = modelMapper.map(collection, CollectionListDTO.class);
+
+                    if (document.exists()) {
+                        dto.setDocumentId(document.getId());
+                        // 썸네일 URL 인코딩
+                        try {
+                            String encodedURL = URLEncoder.encode(dto.getThumbnailPath(), "UTF-8");
+                            dto.setThumbnailPath("https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/" + encodedURL + "?alt=media&token=");
+                        } catch (UnsupportedEncodingException e) {
+                            throw new RuntimeException(e);
+                        }
+                        collections.add(dto);
+                    }
+                }catch (InterruptedException | ExecutionException e) {}
+            }
+            result.put("collections", collections);
+        }
+        return result;
+    }
+
+    public Map<String,Object> getMyContentsList() throws Exception {
+        String userDocumentId = userService.loginUserDocumentId();
+        DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+        DocumentSnapshot userDocSnapshot = userDocRef.get().get();
+
+        CollectionReference contentsRef = firestore.collection("Contents");
+
+        List<String> likes = (List<String>) userDocSnapshot.get("userContentsId");
+        Map<String, Object> result = new HashMap<>();
+
+
+        if (likes == null || likes.isEmpty()) {
+            result.put("userContentsId", "Null");
+        }
+        else {
+            //가져온 도큐먼트 아이디들과 일치하는 컬렉션들 정보 가져옴
+            List<PreviewDTO> contents = new ArrayList<>();
+
+            for (String like : likes) {
+                try {
+                    DocumentSnapshot document = contentsRef.document(like).get().get();
+                    if (document.exists()) {
+                        ModelMapper modelMapper = new ModelMapper();
+                        Contents content = document.toObject(Contents.class);
+                        PreviewDTO previewDTO = modelMapper.map(content, PreviewDTO.class);
+                        previewDTO.setDocumentId(document.getId());
+
+                        try {
+                            String encodedURL = URLEncoder.encode(previewDTO.getThumbnailImg(), "UTF-8");
+                            previewDTO.setThumbnailImg("https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/" + encodedURL + "?alt=media&token=");
+                        } catch (UnsupportedEncodingException e) {
+                            // URL 인코딩 예외 처리
+                            throw new RuntimeException(e);
+                        }
+                        contents.add(previewDTO);
+                    }
+                }catch (InterruptedException | ExecutionException e){}
+            }
+
+            result.put("dto", contents);
+        }
+        return result;
+    }
+
 }

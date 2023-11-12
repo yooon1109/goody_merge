@@ -1,14 +1,12 @@
 package com.honeybee.goody.User;
 
 import com.honeybee.goody.Jwt.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -41,4 +39,9 @@ public class UserController {
         String newUser = joinService.userJoin(userJoinDTO);
         return ResponseEntity.ok(newUser);
     }
-}
+    @Operation(summary = "회원가입 아이디 중복찾기", description = "True면 사용가능, False면 사용불가능")
+    @GetMapping("/join/checkId")
+    public ResponseEntity<Boolean> checkUsernameAvailability(@RequestParam String userId) {
+        boolean isAvailable = joinService.isUserIdAvailable(userId);
+        return ResponseEntity.ok(isAvailable);
+    }}

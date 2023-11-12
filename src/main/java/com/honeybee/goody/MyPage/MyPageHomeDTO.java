@@ -25,9 +25,5 @@ public class MyPageHomeDTO {
 
     private long daysSinceJoin;
 
-    public void setDaysSinceJoin(long daysSinceJoin) {
-        this.daysSinceJoin = daysSinceJoin;
-    }
-
     private String address;
 }

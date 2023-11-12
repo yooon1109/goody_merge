@@ -9,6 +9,7 @@ import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -202,6 +203,16 @@ public class ContentsService {
             contentsDocRef.update(togetherData);
         }
 
+        String documentId = result.get().getId(); // 생성된 문서의 ID
+        //유저의 컬렉션 아이디 필드에 추가해주기
+        DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+        List<Object> userContentsId = (List<Object>) userDocRef.get().get().get("userContentsId");
+        userContentsId.add(documentId);
+
+        Map<String, Object> contentsIdAdd = new HashMap<>();
+        contentsIdAdd.put("userContentsId", userContentsId);
+        userDocRef.update(contentsIdAdd);
+
         return result.get().getId();
     }
 
@@ -209,6 +220,18 @@ public class ContentsService {
     public String deleteContents(String documentId) throws Exception{
         CollectionReference collectionRef = firestore.collection("Contents");//컨텐츠 컬렉션
         ApiFuture<WriteResult> deleteApiFuture = collectionRef.document(documentId).delete();
+
+        //도큐먼트 아이디로 유저 컬렉션 정보 가져옴
+        String userDocumentId = userService.loginUserDocumentId();
+        DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+
+        List<Object> userContentsId = (List<Object>) userDocRef.get().get().get("userContentsId");
+        userContentsId.remove(documentId);
+
+        // 업데이트된 likes 배열을 저장
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("userContentsId", userContentsId);
+        userDocRef.update(updates);
 
         return "delete success";
     }
