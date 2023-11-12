@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 public class CollectionDetailDTO {
     // 컬렉션 아이디
-    private String collectionId;
+    private String documentId;
 
     //컬렉션 제목
     private String title;

@@ -15,7 +15,7 @@ public class CollectionListDTO {
     private String thumbnailPath;
 
     // 컬렉션 아이디
-    private String collectionId;
+    private String documentId;
 
     //작성자 아이디
     private String userId;

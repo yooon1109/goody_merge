@@ -63,7 +63,7 @@ public class CollectionService {
             }).toList();
             detailDTO.setFilePath(images);
 
-            detailDTO.setCollectionId(documentId);
+            detailDTO.setDocumentId(documentId);
 
             //내 글인지 확인
             if(detailDTO.getUserId().equals(userDocumentId)){
@@ -99,7 +99,7 @@ public class CollectionService {
                 Collection collection = document.toObject(Collection.class);
                 ModelMapper modelMapper = new ModelMapper();
                 CollectionListDTO listDTO = modelMapper.map(collection, CollectionListDTO.class);
-                listDTO.setCollectionId(document.getId());
+                listDTO.setDocumentId(document.getId());
 
                 try {
                     String encodedURL = URLEncoder.encode(listDTO.getThumbnailPath(), "UTF-8");
@@ -209,7 +209,7 @@ public class CollectionService {
         return ResponseEntity.ok("삭제 성공");
     }
     //컬렉션 검색
-    public Map<String, Object>  searchCollection(String hashTag1, String hashTag2, String hashTag3) throws Exception{
+    public Map<String, Object> searchCollection(String hashTag1, String hashTag2, String hashTag3) throws Exception{
         String userDocumentId = userService.loginUserDocumentId();
         CollectionReference collectionRef = firestore.collection("Collections");
 
@@ -246,7 +246,7 @@ public class CollectionService {
                 ModelMapper modelMapper = new ModelMapper();
                 Collection collection = document.toObject(Collection.class);
                 CollectionListDTO listDTO = modelMapper.map(collection, CollectionListDTO.class);
-                listDTO.setCollectionId(document.getId());
+                listDTO.setDocumentId(document.getId());
 
                 // 썸네일 URL 인코딩
                 try {
@@ -273,7 +273,6 @@ public class CollectionService {
         Map<String, Object> userUpdates = new HashMap<>();
         userUpdates.put("collectionLikes", userCollectionLikes);
         userDocRef.update(userUpdates);
-
 
         //컬렉션 정보 가져오기
         DocumentReference collectionDocRef = firestore.collection("Collections").document(documentId);
