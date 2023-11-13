@@ -103,13 +103,14 @@ public class MyPageService {
         CollectionReference contentsRef = firestore.collection("Collections");
 
         List<String> likes = (List<String>) userDocSnapshot.get("collectionLikes");
-        likes = new ArrayList<>(new HashSet<>(likes));//중복제거
+
         Map<String, Object> result = new HashMap<>();
 
         if (likes == null || likes.isEmpty()) {
             result.put("collectionLikes", "Null");
         }
         else {
+            likes = new ArrayList<>(new HashSet<>(likes));//중복제거
             //가져온 도큐먼트 아이디들과 일치하는 컬렉션들 정보 가져옴
             List<CollectionListDTO> collections = new ArrayList<>();
             List<String> likesToRemove = new ArrayList<>();//리스트 중에서 존재하지 않는 문서 아이디 리스트
