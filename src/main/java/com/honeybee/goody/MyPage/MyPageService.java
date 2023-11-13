@@ -103,13 +103,14 @@ public class MyPageService {
         CollectionReference contentsRef = firestore.collection("Collections");
 
         List<String> likes = (List<String>) userDocSnapshot.get("collectionLikes");
-        likes = new ArrayList<>(new HashSet<>(likes));//중복제거
+
         Map<String, Object> result = new HashMap<>();
 
         if (likes == null || likes.isEmpty()) {
             result.put("collectionLikes", "Null");
         }
         else {
+            likes = new ArrayList<>(new HashSet<>(likes));//중복제거
             //가져온 도큐먼트 아이디들과 일치하는 컬렉션들 정보 가져옴
             List<CollectionListDTO> collections = new ArrayList<>();
             List<String> likesToRemove = new ArrayList<>();//리스트 중에서 존재하지 않는 문서 아이디 리스트
@@ -187,4 +188,18 @@ public class MyPageService {
         return result;
     }
 
+    public  String updateUserInfo(MyPageUpdateDTO updateDTO) throws  Exception{
+        String userDocumentId = userService.loginUserDocumentId();
+        DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+
+        updateDTO.getName().ifPresent(value -> userDocRef.update("name", value));
+        updateDTO.getNickname().ifPresent(value -> userDocRef.update("nickname", value));
+        updateDTO.getBirth().ifPresent(value -> userDocRef.update("birth", value));
+        updateDTO.getUserPhoneNum().ifPresent(value -> userDocRef.update("userPhoneNum", value));
+        updateDTO.getAccountBank().ifPresent(value -> userDocRef.update("accountBank", value));
+        updateDTO.getAccountNum().ifPresent(value -> userDocRef.update("accountNum", value));
+        updateDTO.getAddress().ifPresent(value -> userDocRef.update("address", value));
+
+        return userDocumentId+"업데이트 성공";
+    }
 }

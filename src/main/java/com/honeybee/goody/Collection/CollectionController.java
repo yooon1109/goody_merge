@@ -1,5 +1,6 @@
 package com.honeybee.goody.Collection;
 
+import com.honeybee.goody.MyPage.MyPageUpdateDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class CollectionController {
     }
 
     @Operation(summary = "컬렉션 팔아주세요", description = "컬렉션 팔아주세요 버튼")
-    @PostMapping("/addCollectionLike")
+    @PostMapping("/addLike")
     public ResponseEntity<String> collectionLikes(@Parameter(description = "게시글 documentId") @RequestParam String documentId)
             throws ExecutionException, InterruptedException {
 
@@ -61,7 +62,7 @@ public class CollectionController {
     }
 
     @Operation(summary = "컬렉션 팔아주세요 취소", description = "컬렉션 팔아주세요 취소")
-    @PostMapping("/removeCollectionLike")
+    @PostMapping("/removeLike")
     public ResponseEntity<String> removeLike(@Parameter(description = "게시글 documentId") @RequestParam String documentId)
             throws ExecutionException, InterruptedException {
 
@@ -69,4 +70,12 @@ public class CollectionController {
         return ResponseEntity.ok(id);
     }
 
+
+    @Operation(summary = "컬렉션 정보 수정", description = "유저의 컬렉션 수정")
+    @PatchMapping("/update")
+    public ResponseEntity<String> updateCollection(@RequestBody CollectionUpdateDTO updateDTO, @RequestParam String documentId) throws Exception {
+
+        String update =  collectionService.updateCollection(updateDTO, documentId);
+        return ResponseEntity.ok(update);
+    }
 }

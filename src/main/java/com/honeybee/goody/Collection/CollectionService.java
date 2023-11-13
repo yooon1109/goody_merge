@@ -9,6 +9,7 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.cloud.StorageClient;
+import com.honeybee.goody.MyPage.MyPageUpdateDTO;
 import com.honeybee.goody.User.UserService;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -160,10 +161,12 @@ public class CollectionService {
         String documentId = docRef.getId();
         //유저의 컬렉션 아이디 필드에 추가해주기
         List<Object> userCollectionId = (List<Object>) userDocRef.get().get().get("userCollectionId");
+
         userCollectionId.add(documentId);
 
         Map<String, Object> collectionIdAdd = new HashMap<>();
         collectionIdAdd.put("userCollectionId", userCollectionId);
+
         userDocRef.update(collectionIdAdd);
 
         return ResponseEntity.ok("잘 됨!");
@@ -320,4 +323,13 @@ public class CollectionService {
 
     }
 
+    public  String updateCollection(CollectionUpdateDTO updateDTO, String doucmentId) throws  Exception{
+        DocumentReference collections = firestore.collection("Collections").document(doucmentId);
+
+        updateDTO.getTitle().ifPresent(value -> collections.update("title", value));
+        updateDTO.getExplain().ifPresent(value -> collections.update("explain", value));
+        updateDTO.getHashTags().ifPresent(value -> collections.update("hashTags", value));
+
+        return doucmentId+"업데이트 성공";
+    }
 }
