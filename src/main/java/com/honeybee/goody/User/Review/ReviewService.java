@@ -27,7 +27,7 @@ public class ReviewService {
         String reviewId = result.get().getId();
         //키워드 카운트
         Map<String,Long> keywords = (Map<String, Long>) docRef.get().get().get("keywords");
-        if(keywords==null||keywords.size()<=6){
+        if(keywords==null||keywords.size()<=12){
             keywords = new HashMap<>();
             for(int i=1;i<=6;i++){
                 keywords.put("good"+i, 0L);
@@ -53,7 +53,7 @@ public class ReviewService {
         return reviewId;
     }
 
-    public ReviewReceiveDTO saveReviewRate(String reviewDocumentId,String receiveId,Long rate) throws Exception{
+    public Map<String,Object> saveReviewRate(String reviewDocumentId,String receiveId,Long rate) throws Exception{
         DocumentReference docRef = firestore.collection("Users").whereEqualTo("userId",receiveId).get().get().getDocuments().get(0).getReference();//유저 문서
         DocumentReference reviewDocRef = docRef.collection("Review").document(reviewDocumentId);//리뷰 서브 컬렉션 문서
         reviewDocRef.update("rating",rate);
@@ -80,9 +80,30 @@ public class ReviewService {
                 totalKey += (keyCnt*(-25));
             }
         }
-        System.out.println(totalKey);
-        Double avgRate = (double) ((totalKey+sumRate)/reviewCnt);
-        docRef.update("avgRate",avgRate);
-        return reviewDocRef.get().get().toObject(ReviewReceiveDTO.class);
+        docRef.update("keywordScore",totalKey);
+        Long totalScore = totalKey + sumRate;
+        Map<String,Object> grade = new HashMap<>();
+        if(totalScore>5000 && reviewCnt>40){
+            docRef.update("grade","여왕벌");
+            grade.put("grade","여왕벌");
+        }
+        else if(totalKey>2500 && reviewCnt>20){
+            docRef.update("grade","꿀벌");
+            grade.put("grade","꿀벌");
+        }
+        else if(totalKey>1000 && reviewCnt>7){
+            docRef.update("grade","애기꿀벌");
+            grade.put("grade","애기꿀벌");
+        }
+        else if(totalKey>0 && reviewCnt>0){
+            docRef.update("grade","애벌레");
+            grade.put("grade","애벌레");
+        }
+        else{
+            docRef.update("grade","장수말벌");
+            grade.put("grade","장수말벌");
+        }
+        return grade;
     }
+
 }

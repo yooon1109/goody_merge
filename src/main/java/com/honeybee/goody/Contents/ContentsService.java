@@ -145,6 +145,8 @@ public class ContentsService {
             DocumentSnapshot doc = firestore.collection("Users").document(contents.getWriterId()).get().get();
             contentsDetailDTO.setWriterDocumentId(contents.getWriterId());
             contentsDetailDTO.setWriterId(doc.getString("userId"));
+            contentsDetailDTO.setNickname(doc.getString("nickname"));//작성자 닉넴
+            contentsDetailDTO.setWriterGrade(doc.getString("grade"));
             // 현재 로그인한 사용자의 정보 가져와서 본인글인지 확인
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String username = userDetails.getUsername();

@@ -35,7 +35,7 @@ public class User {
     private Map<String,Integer> keywords;
     private int reviewCnt;
     private Long sumRate;
-    private double avgRate;
+    private Long keywordScore;
     private List<String> collectionLikes;
     private List<String> userCollectionId;
     private List<String> userContentsId;

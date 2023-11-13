@@ -22,8 +22,10 @@ public class ChatRoom {
     private int messageCnt;
     @Schema(description = "컨텐츠문서아이디")
     private String contentsId;
-    @Schema(description = "판매자 문서아이디 ")
+    @Schema(description = "판매자 아이디 ")
     private String sellerId;
-    @Schema(description = "구매자 문서아이디(추후 단체채팅을 위해 배열로)")
+    @Schema(description = "구매자 아이디(추후 단체채팅을 위해 배열로)")
     private List<String> buyerId;
+    @Schema(description = "")
+    private String roomImg;
 }

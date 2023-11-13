@@ -16,6 +16,10 @@ public class ContentsDetailDTO {
     private String writerDocumentId;
     //글쓴이 아이디
     private String writerId;
+    //글쓴이 닉네임
+    private String nickname;
+    //글쓴이 등급
+    private String writerGrade;
     //내가 작성한 글인지
     private boolean myContents;
     //내가 좋아요 눌렀는지

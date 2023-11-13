@@ -103,8 +103,8 @@ public class MyPageService {
         CollectionReference contentsRef = firestore.collection("Collections");
 
         List<String> likes = (List<String>) userDocSnapshot.get("collectionLikes");
+        likes = new ArrayList<>(new HashSet<>(likes));//중복제거
         Map<String, Object> result = new HashMap<>();
-
 
         if (likes == null || likes.isEmpty()) {
             result.put("collectionLikes", "Null");
@@ -112,16 +112,16 @@ public class MyPageService {
         else {
             //가져온 도큐먼트 아이디들과 일치하는 컬렉션들 정보 가져옴
             List<CollectionListDTO> collections = new ArrayList<>();
-
+            List<String> likesToRemove = new ArrayList<>();//리스트 중에서 존재하지 않는 문서 아이디 리스트
             for (String like : likes) {
                 try {
                     // 문서 ID로 문서 정보 조회
                     DocumentSnapshot document = contentsRef.document(like).get().get();
-                    ModelMapper modelMapper = new ModelMapper();
-                    Collection collection = document.toObject(Collection.class);
-                    CollectionListDTO dto = modelMapper.map(collection, CollectionListDTO.class);
 
-                    if (document.exists()) {
+                    if (document.exists()) {//존재하면
+                        ModelMapper modelMapper = new ModelMapper();
+                        Collection collection = document.toObject(Collection.class);
+                        CollectionListDTO dto = modelMapper.map(collection, CollectionListDTO.class);
                         dto.setDocumentId(document.getId());
                         // 썸네일 URL 인코딩
                         try {
@@ -131,10 +131,14 @@ public class MyPageService {
                             throw new RuntimeException(e);
                         }
                         collections.add(dto);
+                    }else{//존재하지 않으면 삭제할 리스트에 추가
+                        likesToRemove.add(like);
                     }
                 }catch (InterruptedException | ExecutionException e) {}
             }
-            result.put("collections", collections);
+            likes.removeAll(likesToRemove);//유저의 좋아요 리스트에서 존재하지않는 문서아이디들 삭제
+            userDocRef.update("collectionLikes",likes);//해당 필드 업데이트
+            result.put("collectionLikes", collections);
         }
         return result;
     }
