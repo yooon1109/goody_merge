@@ -26,7 +26,7 @@ public class MyPageController {
 
 
     @Operation(summary = "마이페이지 게시글 찜목록", description = "유저의 마이페이지 게시글 찜 목록 리스트")
-    @GetMapping("/ContentsLikeList")
+    @GetMapping("/contentsLikeList")
     public ResponseEntity<Map<String,Object>> getContentsLikePreview() throws Exception {
 
         Map<String,Object> contents = myPageService.getContentsLikePreview();
@@ -34,18 +34,25 @@ public class MyPageController {
     }
 
     @Operation(summary = "마이페이지 컬렉션 팔아주세요 목록", description = "유저의 마이페이지 컬렉션 팔아주세요 목록 리스트")
-    @GetMapping("/CollectionLikeList")
+    @GetMapping("/collectionLikeList")
     public ResponseEntity<Map<String,Object>> getCollectionLikePreview() throws Exception {
         Map<String,Object> contents = myPageService.getCollectionLikePreview();
         return ResponseEntity.ok(contents);
     }
 
     @Operation(summary = "마이페이지 내 게시글 목록", description = "유저의 마이페이지 내 게시글 목록 리스트")
-    @GetMapping("/MyContentsList")
+    @GetMapping("/myContentsList")
     public ResponseEntity<Map<String,Object>> getMyContentsPreview() throws Exception {
 
         Map<String,Object> contents = myPageService.getMyContentsList();
         return ResponseEntity.ok(contents);
+    }
+    @Operation(summary = "마이페이지 내 정보 수정", description = "유저의 마이페이지 수정")
+    @PatchMapping("/updateUser")
+    public ResponseEntity<String> updateUser(@RequestBody MyPageUpdateDTO updateDTO) throws Exception {
+
+        String update =  myPageService.updateUserInfo(updateDTO);;
+        return ResponseEntity.ok(update);
     }
 
 }

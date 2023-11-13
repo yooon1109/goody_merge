@@ -188,4 +188,18 @@ public class MyPageService {
         return result;
     }
 
+    public  String updateUserInfo(MyPageUpdateDTO updateDTO) throws  Exception{
+        String userDocumentId = userService.loginUserDocumentId();
+        DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+
+        updateDTO.getName().ifPresent(value -> userDocRef.update("name", value));
+        updateDTO.getNickname().ifPresent(value -> userDocRef.update("nickname", value));
+        updateDTO.getBirth().ifPresent(value -> userDocRef.update("birth", value));
+        updateDTO.getUserPhoneNum().ifPresent(value -> userDocRef.update("userPhoneNum", value));
+        updateDTO.getAccountBank().ifPresent(value -> userDocRef.update("accountBank", value));
+        updateDTO.getAccountNum().ifPresent(value -> userDocRef.update("accountNum", value));
+        updateDTO.getAddress().ifPresent(value -> userDocRef.update("address", value));
+
+        return userDocumentId+"업데이트 성공";
+    }
 }

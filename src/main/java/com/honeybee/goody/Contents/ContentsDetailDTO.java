@@ -45,4 +45,6 @@ public class ContentsDetailDTO {
     //파일
     private List<String> imgPath;
 
+
+
 }
