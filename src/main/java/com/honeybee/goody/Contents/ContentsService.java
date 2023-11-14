@@ -243,7 +243,7 @@ public class ContentsService {
         throws ExecutionException, InterruptedException {
         return files.stream().map(file-> {
                     try {
-                        return fileService.fileUpload(file);//file storage에 저장후 저장 경로 반환
+                        return fileService.fileUpload(file,"contents");//file storage에 저장후 저장 경로 반환
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

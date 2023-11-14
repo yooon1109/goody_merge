@@ -12,14 +12,14 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FileService {
 
-    public String fileUpload(MultipartFile multipartFile)
+    public String fileUpload(MultipartFile multipartFile,String path)
         throws IOException {
 
         //String filename = id + "_" +multipartFile.getOriginalFilename();
         String bucketName = FirebaseApp.getInstance().getOptions().getStorageBucket(); // Firebase Storage 버킷 이름
         Bucket bucket = StorageClient.getInstance().bucket(bucketName);//'gs://goody-4b16e.appspot.com'
         InputStream content = new ByteArrayInputStream(multipartFile.getBytes());
-        Blob blob = bucket.create("Image/"+multipartFile.getOriginalFilename(),content,multipartFile.getContentType());
+        Blob blob = bucket.create(path+"/"+multipartFile.getOriginalFilename(),content,multipartFile.getContentType());
         return blob.getName();
 
     }
