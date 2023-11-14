@@ -126,6 +126,14 @@ public class ChatService {
                 else buyerAddress.put(buyer,"주소가 입력되지 않았습니다.");
             }
             response.put("address",buyerAddress);
+
+            QuerySnapshot querySnapshot = firestore.collection("Users").whereEqualTo("userId",sellerId).get().get();
+            QueryDocumentSnapshot seller = querySnapshot.getDocuments().get(0);
+            String accountNum = seller.getString("accountNum");
+            String accountBank = seller.getString("accountBank");
+            response.put("MyAccountNum",accountNum);
+            if(accountBank!=null) response.put("MyAccountBank",accountBank);
+            else response.put("MyAccountBank","계좌번호를 입력해주세요");
         }
         else{
             response.put("error","접근권한이 없습니다.");
