@@ -11,6 +11,7 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.Mapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,5 +42,31 @@ public class ChatController {
     @GetMapping("/itemInfo")
     public ResponseEntity<PreviewDTO> itemsInfo(@RequestParam String contentId) throws Exception{
         return ResponseEntity.ok(chatService.getitemInfo(contentId));
+    }
+
+    @Operation(summary = "채팅방 My(구매할사용자) 주소,입금할 계좌번호 Seller(게시글올린사용자) 출력")
+    @GetMapping("/address-Account")
+    public ResponseEntity<Map<String,Object>> address(@RequestParam String roomId)
+        throws Exception {
+        return ResponseEntity.ok(chatService.getaddress(roomId));
+    }
+
+    @Operation(summary = "(구매자일 경우)내 주소 수정")
+    @PostMapping("/updateAddress")
+    public ResponseEntity<Map<String,Object>> updateAddress(@RequestParam String address) throws Exception{
+        return ResponseEntity.ok(chatService.updateAddress(address));
+    }
+
+    @Operation(summary = "(판매자일 경우)내 계좌번호 수정")
+    @PostMapping("/updateAccount")
+    public ResponseEntity<Map<String,Object>> updateAccountNum(@RequestParam String account) throws Exception{
+        return ResponseEntity.ok(chatService.updateAccount(account));
+    }
+
+    @Operation(summary = "채팅방 구매자들의 주소")
+    @GetMapping("/buyerAddress")
+    public ResponseEntity<Map<String,Object>> buyerAddress(@RequestParam String roomId)
+        throws Exception {
+        return ResponseEntity.ok(chatService.buyerAddress(roomId));
     }
 }
