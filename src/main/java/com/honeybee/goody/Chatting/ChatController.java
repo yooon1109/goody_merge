@@ -44,13 +44,6 @@ public class ChatController {
         return ResponseEntity.ok(chatService.getitemInfo(contentId));
     }
 
-    @Operation(summary = "(구매자일 경우)채팅방 My(구매할사용자) 주소,입금할 계좌번호 Seller(게시글올린사용자) 출력")
-    @GetMapping("/address-Account")
-    public ResponseEntity<Map<String,Object>> address(@RequestParam String roomId)
-        throws Exception {
-        return ResponseEntity.ok(chatService.getaddress(roomId));
-    }
-
     @Operation(summary = "(구매자일 경우)내 주소 수정")
     @PostMapping("/updateAddress")
     public ResponseEntity<Map<String,Object>> updateAddress(@RequestParam String address) throws Exception{
@@ -63,8 +56,8 @@ public class ChatController {
         return ResponseEntity.ok(chatService.updateAccount(account));
     }
 
-    @Operation(summary = "(판매자일 경우)채팅방 구매자들의 주소")
-    @GetMapping("/buyerAddress")
+    @Operation(summary = "채팅방 판매자/구매자에 따른 주소,계좌")
+    @GetMapping("/addressInfo")
     public ResponseEntity<Map<String,Object>> buyerAddress(@RequestParam String roomId)
         throws Exception {
         return ResponseEntity.ok(chatService.buyerAddress(roomId));
