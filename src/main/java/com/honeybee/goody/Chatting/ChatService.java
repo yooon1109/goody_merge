@@ -70,24 +70,6 @@ public class ChatService {
         return previewDTO;
     }
 
-    public Map<String,Object> getaddress(String roomId) throws Exception {
-        Map<String,Object> response = new HashMap<>();
-        DocumentReference docRef = firestore.collection("Chats").document(roomId);//문서
-        String sellerId = docRef.get().get().getString("sellerId");
-        QuerySnapshot querySnapshot = firestore.collection("Users").whereEqualTo("userId",sellerId).get().get();
-        QueryDocumentSnapshot seller = querySnapshot.getDocuments().get(0);
-        String accountNum = seller.getString("accountNum");
-        String accountBank = seller.getString("accountBank");
-        response.put("sellerAccountNum",accountNum);
-        if(accountBank!=null) response.put("sellerAccountBank",accountBank);
-        else response.put("sellerAccountBank","계좌번호가 입력되지 않았습니다.");
-        String loginUserId = userService.loginUserDocumentId();
-        String loginUserAddress = firestore.collection("Users").document(loginUserId).get().get().getString("address");
-        if(loginUserAddress!=null) response.put("MyAddress",loginUserAddress);
-        else response.put("MyAddress","주소를 입력해주세요");
-        return response;
-    }
-
     public Map<String,Object> updateAddress(String address) throws Exception {
         Map<String,Object> response = new HashMap<>();
         String loginUserId = userService.loginUserDocumentId();
@@ -111,24 +93,45 @@ public class ChatService {
     public Map<String,Object> buyerAddress(String roomId) throws Exception {
         Map<String,Object> response = new HashMap<>();
         DocumentReference docRef = firestore.collection("Chats").document(roomId);//문서
+
+        //판매자 정보
         String sellerId = docRef.get().get().getString("sellerId");
+        QuerySnapshot querySnapshot = firestore.collection("Users").whereEqualTo("userId",sellerId).get().get();
+        QueryDocumentSnapshot seller = querySnapshot.getDocuments().get(0);
+        String accountNum = seller.getString("accountNum");
+        String accountBank = seller.getString("accountBank");
+
+        List<String> enterUsers = (List<String>) docRef.get().get().get("enterUsers");//채팅방 입장 유저들
+
+        //현재 로그인 유저
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = userDetails.getUsername();//현재 로그인한 유저의 아이디
-        if(username.equals(sellerId)){
-            List<String> enterUsers = (List<String>) docRef.get().get().get("enterUsers");
+        String loginUser = userDetails.getUsername();//현재 로그인한 유저의 아이디
+        if(loginUser.equals(sellerId)){//판매자일 경우
+            response.put("role","seller");
             enterUsers.remove(sellerId);
             Map<String,Object> buyerAddress = new LinkedHashMap<>();
             for(String buyer:enterUsers){
-                QuerySnapshot querySnapshot = firestore.collection("Users").whereEqualTo("userId",buyer).get().get();
-                QueryDocumentSnapshot buyUser = querySnapshot.getDocuments().get(0);
+                QuerySnapshot buyerquerySnapshot = firestore.collection("Users").whereEqualTo("userId",buyer).get().get();
+                QueryDocumentSnapshot buyUser = buyerquerySnapshot.getDocuments().get(0);
                 String address = (String) buyUser.get("address");
                 if(address!=null) buyerAddress.put(buyer,address);
                 else buyerAddress.put(buyer,"주소가 입력되지 않았습니다.");
             }
             response.put("address",buyerAddress);
+
+            response.put("MyAccountNum",accountNum);
+            if(accountBank!=null) response.put("MyAccountBank",accountBank);
+            else response.put("MyAccountBank","계좌번호를 입력해주세요");
         }
-        else{
-            response.put("error","접근권한이 없습니다.");
+        else if(enterUsers.contains(loginUser)){
+            response.put("role","buyer");
+            response.put("sellerAccountNum",accountNum);
+            if(accountBank!=null) response.put("sellerAccountBank",accountBank);
+            else response.put("sellerAccountBank","계좌번호가 입력되지 않았습니다.");
+            String loginUserId = userService.loginUserDocumentId();
+            String loginUserAddress = firestore.collection("Users").document(loginUserId).get().get().getString("address");
+            if(loginUserAddress!=null) response.put("MyAddress",loginUserAddress);
+            else response.put("MyAddress","주소를 입력해주세요");
         }
         return response;
     }
