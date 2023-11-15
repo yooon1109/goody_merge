@@ -5,7 +5,9 @@ import com.google.cloud.firestore.*;
 import com.google.cloud.firestore.Query.Direction;
 import com.honeybee.goody.File.FileService;
 import com.honeybee.goody.User.UserService;
-import java.util.Objects;
+
+import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +21,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -79,10 +77,11 @@ public class ContentsService {
         CollectionReference collectionRef = firestore.collection("Contents");
 
         Query query = collectionRef.orderBy("createdDate", Direction.DESCENDING);
+
         if(search!=null){
             // 'title' 필드 또는 'explain' 필드에서 검색 후 정렬->title 완전 일치만 검색 가능
             query = query
-                    .whereEqualTo("title",search);
+                    .whereArrayContains("hashTags",search);
                    // .whereGreaterThanOrEqualTo("title", search);
 
         }

@@ -3,6 +3,8 @@ package com.honeybee.goody.Contents;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 import java.util.List;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,5 +45,7 @@ public class Contents {//게시글 컨텐츠 등록할 데이터들
     private String thumbnailImg;
     //품절여부
     private boolean sold;
+    //해시태그
+    private List<String> hashTags;
 
 }

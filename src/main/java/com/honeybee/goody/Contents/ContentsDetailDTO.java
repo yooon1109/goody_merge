@@ -1,6 +1,8 @@
 package com.honeybee.goody.Contents;
 
 import java.util.List;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,6 +46,8 @@ public class ContentsDetailDTO {
     private String explain;
     //파일
     private List<String> imgPath;
+    //해시태그
+    private List<String> hashTags;
 
 
 

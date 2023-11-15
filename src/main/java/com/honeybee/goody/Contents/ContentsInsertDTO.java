@@ -44,5 +44,7 @@ public class ContentsInsertDTO {//프론트에서 받아올 데이터들
     //파일
     @Schema(description = "파일", example = "")
     private List<MultipartFile> imgPath;
+    @Schema(description = "해시태그", example = "")
+    private List<String> hashTags;
 
 }

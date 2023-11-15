@@ -32,10 +32,10 @@ public class ContentsController {
 
     @Operation(summary = "게시글 검색", description = "파라미터값에 따라 검색")
     @GetMapping( "/search")
-    public ResponseEntity<List<PreviewDTO>> contentsSearch(@Parameter(description = "검색어") @RequestParam(required = false) String search,
-                                                       @Parameter(description = "") @RequestParam(required = false) String category,
-                                                       @Parameter(description = "") @RequestParam(required = false) String transType,
-                                                       @Parameter(description = "") @RequestParam(required = false) Boolean sold)
+    public ResponseEntity<List<PreviewDTO>> contentsSearch( @Parameter(description = "해시태그 검색") @RequestParam(required = false) String search,
+                                                            @Parameter(description = "") @RequestParam(required = false) String category,
+                                                            @Parameter(description = "") @RequestParam(required = false) String transType,
+                                                            @Parameter(description = "") @RequestParam(required = false) Boolean sold)
             throws ExecutionException, InterruptedException {
 
         List<PreviewDTO> list = contentsService.SearchPreviewContents(search,category,transType,sold);

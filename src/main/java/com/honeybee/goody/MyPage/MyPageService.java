@@ -66,9 +66,10 @@ public class MyPageService {
             result.put("dto", "Null");
         }
         else {
+            likes = new ArrayList<>(new HashSet<>(likes));//중복제거
             //가져온 도큐먼트 아이디들과 일치하는 컬렉션들 정보 가져옴
             List<PreviewDTO> contents = new ArrayList<>();
-
+            List<String> likesToRemove = new ArrayList<>();//리스트 중에서 존재하지 않는 문서 아이디 리스트
             for (String like : likes) {
                 try {
                     DocumentSnapshot document = contentsRef.document(like).get().get();
@@ -86,10 +87,13 @@ public class MyPageService {
                             throw new RuntimeException(e);
                         }
                         contents.add(previewDTO);
+                    }else{//존재하지 않으면 삭제할 리스트에 추가
+                        likesToRemove.add(like);
                     }
                 }catch (InterruptedException | ExecutionException e){}
             }
-
+            likes.removeAll(likesToRemove);//유저의 좋아요 리스트에서 존재하지않는 문서아이디들 삭제
+            userDocRef.update("contentsLikes",likes);//해당 필드 업데이트
             result.put("dto", contents);
         }
         return result;
