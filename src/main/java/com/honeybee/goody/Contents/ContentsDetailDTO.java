@@ -48,6 +48,8 @@ public class ContentsDetailDTO {
     private List<String> imgPath;
     //해시태그
     private List<String> hashTags;
+    //판매 완료 여부
+    private Boolean sold;
 
 
 

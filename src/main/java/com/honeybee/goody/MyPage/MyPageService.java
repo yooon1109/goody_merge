@@ -206,4 +206,21 @@ public class MyPageService {
 
         return userDocumentId+"업데이트 성공";
     }
+
+    public MyPageReviewDTO getMyReviewList() throws Exception{
+
+        String userDocumentId = userService.loginUserDocumentId();
+        DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+        DocumentSnapshot userDocSnapshot = userDocRef.get().get();
+
+        if (userDocSnapshot.exists()) {
+            MyPage myPage = userDocSnapshot.toObject(MyPage.class);
+            ModelMapper modelMapper = new ModelMapper();
+            MyPageReviewDTO dto = modelMapper.map(myPage, MyPageReviewDTO.class);
+
+            return dto;
+        } else {
+            throw new Exception("오류 발생!!");
+        }
+    }
 }
