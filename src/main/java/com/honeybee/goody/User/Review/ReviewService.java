@@ -3,6 +3,7 @@ package com.honeybee.goody.User.Review;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.honeybee.goody.User.UserService;
 
@@ -19,7 +20,7 @@ public class ReviewService {
     private final Firestore firestore;
     private final UserService userService;
 
-    public String saveReviewKeywords(ReviewReceiveDTO review,String receiveId) throws Exception{
+    public String saveReviewKeywords(ReviewReceiveDTO review,String receiveId, String documentId) throws Exception{
         DocumentReference docRef = firestore.collection("Users").whereEqualTo("userId",receiveId).get().get().getDocuments().get(0).getReference();//유저 문서
         CollectionReference subCollectionRef = docRef.collection("Review");//리뷰 서브 컬렉션
         review.setReviewerId(userService.loginUserDocumentId());
@@ -49,6 +50,12 @@ public class ReviewService {
         }else{
             docRef.update("reviewCnt",1);
         }
+
+        //해당 도큐먼트 sold 필드 True로 바꿔주기
+        DocumentReference contents = firestore.collection("Contents").document(documentId);
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("sold", true);
+        contents.update(updates);
 
         return reviewId;
     }

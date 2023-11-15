@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import java.util.Date;
+import java.util.*;
 @Getter
 @Setter
 public class MyPage {
@@ -21,5 +22,5 @@ public class MyPage {
     private String grade;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date joinDate;
-
+    private Map<String, Integer> keywords;
 }

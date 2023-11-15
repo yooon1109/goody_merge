@@ -15,10 +15,16 @@ public class ReviewReceiveDTO {
 
     @Schema(description = "리뷰를 받는사람의 아이디")
     private String reviewerId;
+
     @Schema(description = "선택된 키워드들")
     private List<String> reviewKeywords;
+
     @Schema(description = "별점")
     private double rating;
+
     @Schema(description = "판매물품")
     private String contentsId;
+
+    @Schema(description = "게시글 도큐먼트 아이디")
+    private String documentId;
 }

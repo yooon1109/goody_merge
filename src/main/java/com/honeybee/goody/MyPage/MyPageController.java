@@ -24,7 +24,6 @@ public class MyPageController {
 
     }
 
-
     @Operation(summary = "마이페이지 게시글 찜목록", description = "유저의 마이페이지 게시글 찜 목록 리스트")
     @GetMapping("/contentsLikeList")
     public ResponseEntity<Map<String,Object>> getContentsLikePreview() throws Exception {
@@ -55,4 +54,11 @@ public class MyPageController {
         return ResponseEntity.ok(update);
     }
 
+    @Operation(summary = "마이페이지 리뷰 목록", description = "유저의 마이페이지 내 리뷰 목록 리스트")
+    @GetMapping("/myReviewList")
+    public ResponseEntity<MyPageReviewDTO> getMyReview() throws Exception{
+
+        MyPageReviewDTO dto = myPageService.getMyReviewList();
+        return ResponseEntity.ok(dto);
+    }
 }

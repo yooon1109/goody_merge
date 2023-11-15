@@ -24,4 +24,7 @@ public class Review {
 
     @Schema(description = "전체평점")
     private double totalRate;
+
+    @Schema(description = "게시글 도큐먼트 아이디")
+    private String documentId;
 }

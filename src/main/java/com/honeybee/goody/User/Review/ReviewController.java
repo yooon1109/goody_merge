@@ -22,9 +22,9 @@ public class ReviewController {
     @Operation(summary = "리뷰 키워드 저장", description = "선택된 키워드들을 리스트로 전송")
     @PostMapping("/keywords")
     public ResponseEntity<String> saveReviewKeywords(@RequestBody ReviewReceiveDTO review
-                                                    ,@Parameter(description = "리뷰를 받는 사람 아이디") @RequestParam String receiveId)
+                                                    ,@Parameter(description = "리뷰를 받는 사람 아이디") @RequestParam String receiveId, @RequestParam String contentsDocumentId)
         throws Exception{
-        String documentId = reviewService.saveReviewKeywords(review,receiveId);
+        String documentId = reviewService.saveReviewKeywords(review,receiveId,contentsDocumentId);
         return ResponseEntity.ok(documentId);
     }
 
