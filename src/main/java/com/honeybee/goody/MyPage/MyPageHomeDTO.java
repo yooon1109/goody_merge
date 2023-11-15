@@ -26,4 +26,6 @@ public class MyPageHomeDTO {
     private long daysSinceJoin;
 
     private String address;
+
+    private String userPhoneNum;
 }

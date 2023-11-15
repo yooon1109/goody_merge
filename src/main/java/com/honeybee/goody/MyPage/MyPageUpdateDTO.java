@@ -15,10 +15,8 @@ import java.util.Date;
 @Setter
 public class MyPageUpdateDTO {
 
-    private Optional<String> name;
     private Optional<String> nickname;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Optional<Date> birth;
     private Optional<String> userPhoneNum;
     private Optional<String> accountBank;
     private Optional<String> accountNum;
