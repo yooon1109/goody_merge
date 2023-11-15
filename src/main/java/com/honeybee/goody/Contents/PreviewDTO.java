@@ -28,4 +28,5 @@ public class PreviewDTO {//게시글 미리보기(썸네일)에 필요한 데이
 
     private String thumbnailImg;
 
+    private String writerId;
 }
