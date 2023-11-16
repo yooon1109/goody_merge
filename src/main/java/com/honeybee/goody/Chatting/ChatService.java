@@ -35,7 +35,6 @@ public class ChatService {
         CollectionReference subCollectionRef = docRef.collection("Messages");
         subCollectionRef.document(String.valueOf(messageCnt+1)).set(message);
         docRef.update("messageCnt",messageCnt+1);
-        docRef.update("lastSend",message.getTime());
         return subCollectionRef.getId();
     }
 
@@ -76,8 +75,7 @@ public class ChatService {
         String loginUserId = userService.loginUserDocumentId();
         DocumentReference docRef = firestore.collection("Users").document(loginUserId);
         docRef.update("address",address);
-        String updated = docRef.get().get().getString("address");
-        response.put("MyAddress",updated);
+        response.put("MyAddress",address);
         return response;
     }
 
@@ -86,8 +84,7 @@ public class ChatService {
         String loginUserId = userService.loginUserDocumentId();
         DocumentReference docRef = firestore.collection("Users").document(loginUserId);
         docRef.update("accountNum",accountNum);
-        String updated = docRef.get().get().getString("accountNum");
-        response.put("accountNum",updated);
+        response.put("accountNum",accountNum);
         return response;
     }
 
@@ -121,18 +118,19 @@ public class ChatService {
             response.put("address",buyerAddress);
 
             response.put("MyAccountNum",accountNum);
-            if(accountBank!=null) response.put("MyAccountBank",accountBank);
-            else response.put("MyAccountBank","계좌번호를 입력해주세요");
+            response.put("MyAccountBank",accountBank);
+//            else response.put("MyAccountBank","계좌번호를 입력해주세요");
         }
-        else if(enterUsers.contains(loginUser)){
+        else if(enterUsers.contains(loginUser)){//구매자일경우
             response.put("role","buyer");
-            response.put("sellerAccountNum",accountNum);
+            if(accountNum!=null) response.put("sellerAccountNum",accountNum);
+            else response.put("sellerAccountNum","계좌번호가 입력되지 않았습니다.");
             if(accountBank!=null) response.put("sellerAccountBank",accountBank);
             else response.put("sellerAccountBank","계좌번호가 입력되지 않았습니다.");
             String loginUserId = userService.loginUserDocumentId();
             String loginUserAddress = firestore.collection("Users").document(loginUserId).get().get().getString("address");
-            if(loginUserAddress!=null) response.put("MyAddress",loginUserAddress);
-            else response.put("MyAddress","주소를 입력해주세요");
+            response.put("MyAddress",loginUserAddress);
+//            else response.put("MyAddress","주소를 입력해주세요");
         }
         return response;
     }
