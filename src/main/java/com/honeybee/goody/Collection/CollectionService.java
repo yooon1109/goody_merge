@@ -271,11 +271,15 @@ public class CollectionService {
         String userDocumentId = userService.loginUserDocumentId();
         DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
 
-        List<String> userCollectionLikes = (List<String>) userDocRef.get().get().get("collectionLikes");
-        userCollectionLikes.add(documentId);
-        Map<String, Object> userUpdates = new HashMap<>();
-        userUpdates.put("collectionLikes", userCollectionLikes);
-        userDocRef.update(userUpdates);
+        userDocRef.update("collectionLikes",FieldValue.arrayUnion(documentId));
+//        List<String> userCollectionLikes = (List<String>) userDocRef.get().get().get("collectionLikes");
+//        if (userCollectionLikes == null) {
+//            userCollectionLikes = new ArrayList<>();
+//        }
+//        userCollectionLikes.add(documentId);
+//        Map<String, Object> userUpdates = new HashMap<>();
+//        userUpdates.put("collectionLikes", documentId);
+//        userDocRef.update(userUpdates);
 
         //컬렉션 정보 가져오기
         DocumentReference collectionDocRef = firestore.collection("Collections").document(documentId);

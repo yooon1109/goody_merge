@@ -256,13 +256,18 @@ public class ContentsService {
         String userDocumentId = userService.loginUserDocumentId();
         DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
 
-        List<Object> likes = (List<Object>) userDocRef.get().get().get("contentsLikes");
+        userDocRef.update("contentsLikes",FieldValue.arrayUnion(documentId));
+//        List<Object> likes = (List<Object>) userDocRef.get().get().get("contentsLikes");
+//
+//        if (likes == null) {
+//            likes = new ArrayList<>();
+//        }
+//
+//        likes.add(documentId);
 
-        likes.add(documentId);
-
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("contentsLikes", likes);
-        userDocRef.update(updates);
+//        Map<String, Object> updates = new HashMap<>();
+//        updates.put("contentsLikes", likes);
+//        userDocRef.update(updates);
 
         return documentId;
 
