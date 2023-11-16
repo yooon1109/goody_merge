@@ -42,6 +42,7 @@ public class Collection {
     //해쉬태크
     private List<String> hashTags;
 
+    //컬렉션 좋아요한 유저 아이디들
     private List<String> collectionLikesUserId;
 
 }

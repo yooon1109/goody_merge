@@ -196,9 +196,7 @@ public class MyPageService {
         String userDocumentId = userService.loginUserDocumentId();
         DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
 
-        updateDTO.getName().ifPresent(value -> userDocRef.update("name", value));
         updateDTO.getNickname().ifPresent(value -> userDocRef.update("nickname", value));
-        updateDTO.getBirth().ifPresent(value -> userDocRef.update("birth", value));
         updateDTO.getUserPhoneNum().ifPresent(value -> userDocRef.update("userPhoneNum", value));
         updateDTO.getAccountBank().ifPresent(value -> userDocRef.update("accountBank", value));
         updateDTO.getAccountNum().ifPresent(value -> userDocRef.update("accountNum", value));
