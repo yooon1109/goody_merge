@@ -54,8 +54,7 @@ public class ChatRoomService {
         for(String chatRoomId : chatRooms){
             DocumentSnapshot chatDocSnap = firestore.collection("Chats").document(chatRoomId).get().get();
             ChatRoom room = chatDocSnap.toObject(ChatRoom.class);
-            String contentsId = chatDocSnap.getString("contentsId");
-            String img = firestore.collection("Contents").document(contentsId).get().get().getString("thumbnailImg");
+            String img = room.getRoomImg();
             String encodedURL = URLEncoder.encode(img, "UTF-8");
             room.setRoomImg("https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+encodedURL + "?alt=media&token=");
             chatRoomList.add(room);
