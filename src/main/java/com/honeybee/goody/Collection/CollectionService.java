@@ -159,15 +159,18 @@ public class CollectionService {
 
         // 방금 저장한 도큐먼트의 아이디 가져오기
         String documentId = docRef.getId();
-        //유저의 컬렉션 아이디 필드에 추가해주기
-        List<Object> userCollectionId = (List<Object>) userDocRef.get().get().get("userCollectionId");
+//        //유저의 컬렉션 아이디 필드에 추가해주기
+//        List<Object> userCollectionId = (List<Object>) userDocRef.get().get().get("userCollectionId");
+//
+//        userCollectionId.add(documentId);
+//
+//        Map<String, Object> collectionIdAdd = new HashMap<>();
+//        collectionIdAdd.put("userCollectionId", userCollectionId);
+//
+//        userDocRef.update(collectionIdAdd);
 
-        userCollectionId.add(documentId);
+        userDocRef.update("userCollectionId",FieldValue.arrayUnion(documentId));
 
-        Map<String, Object> collectionIdAdd = new HashMap<>();
-        collectionIdAdd.put("userCollectionId", userCollectionId);
-
-        userDocRef.update(collectionIdAdd);
 
         return ResponseEntity.ok("잘 됨!");
     }
@@ -316,7 +319,7 @@ public class CollectionService {
         //컬렉션의 좋아요 개수 가져오기
         Long collectionLikeCnt = (Long) collectionDocRef.get().get().getLong("likeCount");
 
-        //좋아요 개수 증가해서 넣어주기
+        //좋아요 개수 감소하고 넣어주기
         Map<String, Object> likesUpdate = new HashMap<>();
         likesUpdate.put("likeCount", (Long)collectionLikeCnt-1);
         collectionDocRef.update(likesUpdate);
