@@ -1,6 +1,8 @@
 package com.honeybee.goody.Chatting;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.Date;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,4 +30,5 @@ public class ChatRoom {
     private List<String> buyerId;
     @Schema(description = "")
     private String roomImg;
+    private Date lastSend;
 }

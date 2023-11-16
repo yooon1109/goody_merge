@@ -35,6 +35,7 @@ public class ChatService {
         CollectionReference subCollectionRef = docRef.collection("Messages");
         subCollectionRef.document(String.valueOf(messageCnt+1)).set(message);
         docRef.update("messageCnt",messageCnt+1);
+        docRef.update("lastSend",message.getTime());
         return subCollectionRef.getId();
     }
 
