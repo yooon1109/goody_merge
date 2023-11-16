@@ -205,14 +205,16 @@ public class ContentsService {
         }
 
         String documentId = result.get().getId(); // 생성된 문서의 ID
-        //유저의 컬렉션 아이디 필드에 추가해주기
+//        //유저의 컬렉션 아이디 필드에 추가해주기
         DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
-        List<Object> userContentsId = (List<Object>) userDocRef.get().get().get("userContentsId");
-        userContentsId.add(documentId);
+//        List<Object> userContentsId = (List<Object>) userDocRef.get().get().get("userContentsId");
+//        userContentsId.add(documentId);
+//
+//        Map<String, Object> contentsIdAdd = new HashMap<>();
+//        contentsIdAdd.put("userContentsId", userContentsId);
+//        userDocRef.update(contentsIdAdd);
 
-        Map<String, Object> contentsIdAdd = new HashMap<>();
-        contentsIdAdd.put("userContentsId", userContentsId);
-        userDocRef.update(contentsIdAdd);
+        userDocRef.update("userContentsId",FieldValue.arrayUnion(documentId));
 
         return result.get().getId();
     }
