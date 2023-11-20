@@ -8,6 +8,7 @@ import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.honeybee.goody.Contents.Contents;
 import com.honeybee.goody.Contents.PreviewDTO;
+import com.honeybee.goody.File.FileService;
 import com.honeybee.goody.User.UserService;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -21,6 +22,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +30,7 @@ public class ChatService {
 
     private final Firestore firestore;
     private final UserService userService;
-
+    private final FileService fileService;
     public String saveChatMessage(ChatMessage message) throws Exception{
         DocumentReference docRef = firestore.collection("Chats").document(message.getRoomId());//문서
         Long messageCnt = (Long) docRef.get().get().get("messageCnt");
@@ -37,6 +39,13 @@ public class ChatService {
         docRef.update("messageCnt",messageCnt+1);
         docRef.update("lastSend",message.getTime());
         return subCollectionRef.getId();
+    }
+
+    public String saveChatImg(MultipartFile multipartFile, String roomId) throws Exception{
+//        DocumentReference docRef = firestore.collection("Chats").document(roomId);//문서
+        String filePath = fileService.fileUpload(multipartFile,"ChatMessage/"+roomId);
+
+        return filePath;
     }
 
     public List<ChatMessage> allChatMessage(String roomId) throws Exception{
@@ -49,6 +58,10 @@ public class ChatService {
             DocumentSnapshot documentSnapshot = subCollectionRef.document(String.valueOf(i)).get().get();
             ChatMessage chatMessage = documentSnapshot.toObject(ChatMessage.class);
             if(chatMessage!=null){
+                if(chatMessage.getType().equals("IMG")){
+                    String encodedURL = URLEncoder.encode(chatMessage.getMessage(), "UTF-8");
+                    chatMessage.setMessage("https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+encodedURL + "?alt=media&token=");
+                }
                 chatMessageList.add(chatMessage);
             }
         }
