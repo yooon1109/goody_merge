@@ -1,6 +1,8 @@
 package com.honeybee.goody.Chatting;
 
 import java.util.Date;
+
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +12,7 @@ public class ChatMessage {
 
     // 메시지 타입 : 입장, 채팅
     enum MessageType {
-        TALK,JOIN
+        TALK,JOIN,IMG
     }
 
     private MessageType type; //메시지 타입
