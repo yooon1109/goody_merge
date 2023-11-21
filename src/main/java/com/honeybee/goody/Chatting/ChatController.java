@@ -22,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class ChatController {
     private final SimpMessageSendingOperations messagingTemplate;
     private final ChatService chatService;
+    private final ChatRoomService chatRoomService;
+
     @MessageMapping("/chat/message")
     public void message(ChatMessage message) throws Exception {
         if (ChatMessage.MessageType.JOIN.equals(message.getType()))
@@ -73,4 +75,6 @@ public class ChatController {
         throws Exception {
         return ResponseEntity.ok(chatService.buyerAddress(roomId));
     }
+
+
 }
