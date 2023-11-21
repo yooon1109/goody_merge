@@ -6,6 +6,7 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
+import com.honeybee.goody.Chatting.ChatMessage.MessageType;
 import com.honeybee.goody.Contents.Contents;
 import com.honeybee.goody.Contents.PreviewDTO;
 import com.honeybee.goody.File.FileService;
@@ -57,7 +58,8 @@ public class ChatService {
             DocumentSnapshot documentSnapshot = subCollectionRef.document(String.valueOf(i)).get().get();
             ChatMessage chatMessage = documentSnapshot.toObject(ChatMessage.class);
             if(chatMessage!=null){
-                if(chatMessage.getType().equals("IMG")){
+                System.out.println(chatMessage.getType());
+                if(chatMessage.getType()== MessageType.IMG){
                     String encodedURL = URLEncoder.encode(chatMessage.getMessage(), "UTF-8");
                     chatMessage.setMessage("https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+encodedURL + "?alt=media&token=");
                 }
