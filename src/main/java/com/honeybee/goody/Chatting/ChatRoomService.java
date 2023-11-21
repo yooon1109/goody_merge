@@ -1,10 +1,7 @@
 package com.honeybee.goody.Chatting;
 
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.FieldValue;
-import com.google.cloud.firestore.Firestore;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
 import com.honeybee.goody.User.UserService;
 
 import java.net.URLEncoder;
@@ -12,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -64,4 +62,46 @@ public class ChatRoomService {
 
         return chatRoomList;
     }
+
+    //채팅방 삭제
+    public ResponseEntity<String> deleteChatRoom(String roomId, List<String> enterUsers) throws Exception{
+        CollectionReference collectionRef = firestore.collection("Chats");
+        ApiFuture<WriteResult> deleteApiFuture = collectionRef.document(roomId).delete();
+
+        deleteSubcollection(collectionRef.document(roomId), "Messages");
+
+        // 채팅방 문서 삭제
+        collectionRef.document(roomId).delete().get();
+
+        //enterUsers에 있는 유저들의 chatRooms 배열 필드에서 해당 채팅방 삭제
+        CollectionReference usersRef = firestore.collection("Users");
+        for (String userId : enterUsers) {
+            Query query = usersRef.whereEqualTo("userId", userId);
+            ApiFuture<QuerySnapshot> querySnapshot = query.get();
+
+            for (DocumentSnapshot document : querySnapshot.get().getDocuments()) {
+                if (document.exists()) {
+                    DocumentReference userDocRef = document.getReference();
+                    // chatRooms 필드에서 roomId 삭제
+                    userDocRef.update("chatRooms", FieldValue.arrayRemove(roomId)).get();
+                }
+            }
+        }
+
+        return ResponseEntity.ok("채팅방 삭제 성공");
+    }
+
+    //하위컬렉션 사진 삭제하는거
+    private void deleteSubcollection(DocumentReference docRef, String subcollectionName) throws Exception {
+        // 하위 컬렉션의 모든 문서를 얻음
+        ApiFuture<QuerySnapshot> future = docRef.collection(subcollectionName).get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        // 각 문서 삭제
+        for (DocumentSnapshot document : documents) {
+            document.getReference().delete().get();
+        }
+    }
+
+
 }

@@ -166,6 +166,17 @@ public class ContentsService {
                 }
             }
 
+            //채팅방 생성된 유저인지 확인
+            String chatDocumentId = username + "-" + documentId;
+            try {
+                DocumentSnapshot chatroomRef = firestore.collection("Chats").document(chatDocumentId).get().get();
+                if (chatroomRef.exists()) {
+                    contentsDetailDTO.setIsChatEntered(true);
+                } else {
+                    contentsDetailDTO.setIsChatEntered(false);
+                }
+            } catch(Exception e) {throw new RuntimeException(e);}
+
             return contentsDetailDTO;
         }else{
             return null;

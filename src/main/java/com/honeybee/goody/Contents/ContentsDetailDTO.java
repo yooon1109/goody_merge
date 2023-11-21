@@ -50,7 +50,7 @@ public class ContentsDetailDTO {
     private List<String> hashTags;
     //판매 완료 여부
     private Boolean sold;
-
-
+    //구매하기 버튼 눌렀던 게시글인지
+    private Boolean isChatEntered;
 
 }
