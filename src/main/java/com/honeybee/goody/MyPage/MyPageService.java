@@ -1,17 +1,30 @@
 package com.honeybee.goody.MyPage;
 
 import com.google.cloud.firestore.*;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.cloud.StorageClient;
 import com.honeybee.goody.Collection.Collection;
 import com.honeybee.goody.Collection.CollectionListDTO;
 import com.honeybee.goody.Contents.Contents;
 import com.honeybee.goody.Contents.PreviewDTO;
 import com.honeybee.goody.User.UserService;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.modelmapper.ModelMapper;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -45,6 +58,18 @@ public class MyPageService {
             long daysSinceJoin = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS)+1;
             dto.setDaysSinceJoin(daysSinceJoin);
 
+
+            String profileImg = dto.getProfileImg();
+            if(profileImg.equals("Null")) {
+                dto.setProfileImg("Null");
+            }
+            else{
+                try{
+                    String encodedURL = URLEncoder.encode(profileImg, "UTF-8");
+                    String profileImgPath = "https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+ encodedURL + "?alt=media&token=";
+                    dto.setProfileImg(profileImgPath);
+                } catch(UnsupportedEncodingException e){throw new Exception(e);}
+            }
             return dto;
         } else {
             throw new Exception("없음!!");
@@ -195,14 +220,52 @@ public class MyPageService {
     public  String updateUserInfo(MyPageUpdateDTO updateDTO) throws  Exception{
         String userDocumentId = userService.loginUserDocumentId();
         DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userName = userDetails.getUsername();
 
-        updateDTO.getNickname().ifPresent(value -> userDocRef.update("nickname", value));
-        updateDTO.getUserPhoneNum().ifPresent(value -> userDocRef.update("userPhoneNum", value));
-        updateDTO.getAccountBank().ifPresent(value -> userDocRef.update("accountBank", value));
-        updateDTO.getAccountNum().ifPresent(value -> userDocRef.update("accountNum", value));
-        updateDTO.getAddress().ifPresent(value -> userDocRef.update("address", value));
+        if (updateDTO.getNickname() != null) {
+            userDocRef.update("nickname", updateDTO.getNickname());
+        }
+        if (updateDTO.getUserPhoneNum() != null) {
+            userDocRef.update("userPhoneNum", updateDTO.getUserPhoneNum());
+        }
+        if (updateDTO.getAccountBank() != null) {
+            userDocRef.update("accountBank", updateDTO.getAccountBank());
+        }
+        if (updateDTO.getAccountNum() != null) {
+            userDocRef.update("accountNum", updateDTO.getAccountNum());
+        }
+        if (updateDTO.getAddress() != null) {
+            userDocRef.update("address", updateDTO.getAddress());
+        }
+
+        if (updateDTO.getProfileImg() != null) {
+            try {
+                String imageUrl = saveImagesToStorage(userName, updateDTO.getProfileImg());
+                userDocRef.update("profileImg", imageUrl);
+            } catch (IOException e) {e.printStackTrace();}
+        }
 
         return userDocumentId+"업데이트 성공";
+    }
+
+    private String saveImagesToStorage(String userName, MultipartFile image) throws IOException {
+        String imageUrl = new String();
+        try {
+            // Firebase Storage 초기화
+            Storage storage = StorageOptions.getDefaultInstance().getService();
+
+            String bucketName = FirebaseApp.getInstance().getOptions().getStorageBucket();
+            Bucket bucket = StorageClient.getInstance().bucket(bucketName);//'gs://goody-4b16e.appspot.com'
+            InputStream content = new ByteArrayInputStream(image.getBytes());
+            Blob blob = bucket.create("profile/" + userName, content,image.getContentType());
+            imageUrl = blob.getName();
+
+        } catch (Exception e) {
+            // 예외 처리
+            e.printStackTrace();
+        }
+        return imageUrl;
     }
 
     public MyPageReviewDTO getMyReviewList() throws Exception{

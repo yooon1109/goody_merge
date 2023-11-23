@@ -2,10 +2,9 @@ package com.honeybee.goody.MyPage;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -47,8 +46,8 @@ public class MyPageController {
         return ResponseEntity.ok(contents);
     }
     @Operation(summary = "마이페이지 내 정보 수정", description = "유저의 마이페이지 수정")
-    @PatchMapping("/updateUser")
-    public ResponseEntity<String> updateUser(@RequestBody MyPageUpdateDTO updateDTO) throws Exception {
+    @PatchMapping(path = "/updateUser", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> updateUser(@ModelAttribute MyPageUpdateDTO updateDTO) throws Exception {
 
         String update =  myPageService.updateUserInfo(updateDTO);;
         return ResponseEntity.ok(update);

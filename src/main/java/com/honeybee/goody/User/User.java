@@ -39,6 +39,8 @@ public class User {
     private List<String> collectionLikes;
     private List<String> userCollectionId;
     private List<String> userContentsId;
+    private String profileImg;
+
 
 
 }

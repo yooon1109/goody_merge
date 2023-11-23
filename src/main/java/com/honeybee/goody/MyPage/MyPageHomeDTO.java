@@ -28,4 +28,8 @@ public class MyPageHomeDTO {
     private String address;
 
     private String userPhoneNum;
+
+    private String profileImg;
+
+
 }

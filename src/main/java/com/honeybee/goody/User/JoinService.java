@@ -46,6 +46,7 @@ public class JoinService {
         user.setAddress("입력해주세요");
         user.setAccountBank("입력해주세요");
         user.setAccountNum("입력해주세요");
+        user.setProfileImg("Null");
 
         try {
             //컬렉션참조
