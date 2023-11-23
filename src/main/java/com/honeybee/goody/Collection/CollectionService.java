@@ -47,6 +47,7 @@ public class CollectionService {
             Collection collection = documentSnapshot.toObject(Collection.class);
             ModelMapper modelMapper = new ModelMapper();
             CollectionDetailDTO detailDTO = modelMapper.map(collection, CollectionDetailDTO.class);
+            DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
 
             // createdDate 필드를 매핑
             com.google.cloud.Timestamp firestoreTimestamp = documentSnapshot.get("createdDate", com.google.cloud.Timestamp.class);
@@ -66,21 +67,26 @@ public class CollectionService {
 
             detailDTO.setDocumentId(documentId);
 
+            String profileImg = userDocRef.get().get().getString("profileImg");
+            try{
+                String encodedURL = URLEncoder.encode(profileImg, "UTF-8");
+                String profileImgPath = "https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+ encodedURL + "?alt=media&token=";
+                detailDTO.setProfileImg(profileImgPath);
+            } catch(UnsupportedEncodingException e){throw new Exception(e);}
+
+
             //내 글인지 확인
             if(detailDTO.getUserId().equals(userDocumentId)){
                 detailDTO.setMyCollection(true);
-            }
-            else detailDTO.setMyCollection(false);
+            } else detailDTO.setMyCollection(false);
 
             //좋아요 했던 컬렉션인지 확인
-            DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
             List<String> likes = (List<String>) userDocRef.get().get().get("collectionLikes");
             for(String like : likes){
                 if(like.equals(documentId)){
                     detailDTO.setLiked(true);
-                }else{
-                    detailDTO.setLiked(false);
                 }
+                else{detailDTO.setLiked(false);}
             }
 
             return detailDTO;
@@ -159,16 +165,6 @@ public class CollectionService {
 
         // 방금 저장한 도큐먼트의 아이디 가져오기
         String documentId = docRef.getId();
-//        //유저의 컬렉션 아이디 필드에 추가해주기
-//        List<Object> userCollectionId = (List<Object>) userDocRef.get().get().get("userCollectionId");
-//
-//        userCollectionId.add(documentId);
-//
-//        Map<String, Object> collectionIdAdd = new HashMap<>();
-//        collectionIdAdd.put("userCollectionId", userCollectionId);
-//
-//        userDocRef.update(collectionIdAdd);
-
         userDocRef.update("userCollectionId",FieldValue.arrayUnion(documentId));
 
 
@@ -333,9 +329,11 @@ public class CollectionService {
     public  String updateCollection(CollectionUpdateDTO updateDTO, String doucmentId) throws  Exception{
         DocumentReference collections = firestore.collection("Collections").document(doucmentId);
 
-        updateDTO.getTitle().ifPresent(value -> collections.update("title", value));
-        updateDTO.getExplain().ifPresent(value -> collections.update("explain", value));
-        updateDTO.getHashTags().ifPresent(value -> collections.update("hashTags", value));
+        if (updateDTO.getTitle() != null) {collections.update("title", updateDTO.getTitle());}
+
+        if (updateDTO.getExplain() != null) {collections.update("explain", updateDTO.getExplain());}
+
+        if (updateDTO.getHashTags() != null) {collections.update("hashTags", updateDTO.getHashTags());}
 
         return doucmentId+"업데이트 성공";
     }

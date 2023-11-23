@@ -41,4 +41,7 @@ public class CollectionDetailDTO {
     //해쉬태크
     private List<String> hashTags;
 
+    private String profileImg;
+
+
 }

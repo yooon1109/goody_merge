@@ -14,8 +14,8 @@ import java.util.Optional;
 @Setter
 public class CollectionUpdateDTO {
 
-    private Optional<String> title;
-    private Optional<String> explain;
-    private Optional<List<String>> hashTags;
+    private String title;
+    private String explain;
+    private List<String> hashTags;
 
 }

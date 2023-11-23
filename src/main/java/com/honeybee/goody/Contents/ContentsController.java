@@ -45,7 +45,7 @@ public class ContentsController {
     @Operation(summary = "게시글 상세정보", description = "게시글 문서아이디로 상세정보 반환")
     @GetMapping("/detail")
     public ResponseEntity<ContentsDetailDTO> contentDetail(@Parameter(description = "게시글 documentId") @RequestParam String documentId)
-        throws ExecutionException, InterruptedException {
+            throws Exception {
         ContentsDetailDTO contentsDetailDTO = contentsService.getContentsDetail(documentId);
         return ResponseEntity.ok(contentsDetailDTO);
     }

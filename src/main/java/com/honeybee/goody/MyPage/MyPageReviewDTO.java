@@ -18,4 +18,7 @@ public class MyPageReviewDTO {
 
     private Map<String,Integer> keywords;
 
+    private String profileImg;
+
+
 }

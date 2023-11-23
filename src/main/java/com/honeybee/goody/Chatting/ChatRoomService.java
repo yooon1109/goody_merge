@@ -64,14 +64,19 @@ public class ChatRoomService {
     }
 
     //채팅방 삭제
-    public ResponseEntity<String> deleteChatRoom(String roomId, List<String> enterUsers) throws Exception{
+    public ResponseEntity<String> deleteChatRoom(String roomId) throws Exception{
         CollectionReference collectionRef = firestore.collection("Chats");
-        ApiFuture<WriteResult> deleteApiFuture = collectionRef.document(roomId).delete();
+        DocumentReference doc = collectionRef.document(roomId);
+        DocumentSnapshot documentSnapshot = doc.get().get();
 
-        deleteSubcollection(collectionRef.document(roomId), "Messages");
 
+        List<String> enterUsers = (List<String>) documentSnapshot.get("enterUsers");
+
+        ApiFuture<WriteResult> deleteApiFuture = doc.delete();
+        deleteSubcollection(doc, "Messages");
         // 채팅방 문서 삭제
-        collectionRef.document(roomId).delete().get();
+        doc.delete().get();
+
 
         //enterUsers에 있는 유저들의 chatRooms 배열 필드에서 해당 채팅방 삭제
         CollectionReference usersRef = firestore.collection("Users");
