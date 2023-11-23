@@ -120,10 +120,14 @@ public class ContentsService {
     }
 
     //컨텐츠 상세 정보
-    public ContentsDetailDTO getContentsDetail(String documentId)
-        throws ExecutionException, InterruptedException {
-        CollectionReference collectionRef = firestore.collection("Contents");//컨텐츠 컬렉션
+    public ContentsDetailDTO getContentsDetail(String documentId) throws Exception {
+        //컨텐츠 정보
+        CollectionReference collectionRef = firestore.collection("Contents");
         DocumentSnapshot documentSnapshot = collectionRef.document(documentId).get().get();
+        //유저정보
+        String userDocumentId = userService.loginUserDocumentId();
+        DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
+
 
         if(documentSnapshot.exists()){
             Contents contents = documentSnapshot.toObject(Contents.class);
@@ -146,6 +150,20 @@ public class ContentsService {
             contentsDetailDTO.setWriterId(doc.getString("userId"));
             contentsDetailDTO.setNickname(doc.getString("nickname"));//작성자 닉넴
             contentsDetailDTO.setWriterGrade(doc.getString("grade"));
+
+            String profileImg = doc.getString("profileImg");
+            if(profileImg.equals("Null")) {
+                contentsDetailDTO.setProfileImg("Null");
+            }
+            else{
+                try{
+                    String encodedURL = URLEncoder.encode(profileImg, "UTF-8");
+                    String profileImgPath = "https://firebasestorage.googleapis.com/v0/b/goody-4b16e.appspot.com/o/"+ encodedURL + "?alt=media&token=";
+                    contentsDetailDTO.setProfileImg(profileImgPath);
+                } catch(UnsupportedEncodingException e){throw new Exception(e);}
+            }
+
+
             // 현재 로그인한 사용자의 정보 가져와서 본인글인지 확인
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String username = userDetails.getUsername();
@@ -155,8 +173,6 @@ public class ContentsService {
                 contentsDetailDTO.setMyContents(false);
             }
             // 사용자가 좋아요한 글인지 확인
-            String userDocumentId = userService.loginUserDocumentId();
-            DocumentReference userDocRef = firestore.collection("Users").document(userDocumentId);
             List<String> likes = (List<String>) userDocRef.get().get().get("contentsLikes");
             if(likes!=null){
                 for(String like : likes){

@@ -23,4 +23,5 @@ public class MyPage {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date joinDate;
     private Map<String, Integer> keywords;
+    private String profileImg;
 }

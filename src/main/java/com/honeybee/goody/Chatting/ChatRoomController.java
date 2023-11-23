@@ -35,8 +35,8 @@ public class ChatRoomController {
 
     @Operation(summary = "채팅방 삭제", description = "채팅방 삭제하기")
     @DeleteMapping(value = "/delete")
-    public ResponseEntity<ResponseEntity<String>> chatRoomDelete(@RequestParam String roomId, @RequestParam List<String> enterUsers)
+    public ResponseEntity<ResponseEntity<String>> chatRoomDelete(@RequestParam String roomId)
             throws Exception{
-        return ResponseEntity.ok(chatRoomService.deleteChatRoom(roomId, enterUsers));
+        return ResponseEntity.ok(chatRoomService.deleteChatRoom(roomId));
     }
 }

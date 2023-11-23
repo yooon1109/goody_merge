@@ -1,0 +1,9 @@
+{
+  "short_name": "Goody",
+"name": "GOODY : 어른들의 장남감 플랫폼",
+  
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

@@ -52,5 +52,8 @@ public class ContentsDetailDTO {
     private Boolean sold;
     //구매하기 버튼 눌렀던 게시글인지
     private Boolean isChatEntered;
+    //유저 프로필 이미지
+    private String profileImg;
+
 
 }
