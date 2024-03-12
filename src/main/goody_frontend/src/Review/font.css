@@ -1,0 +1,36 @@
+@font-face {
+    font-family: "chatfont";
+    src: url("../Chatting/21582170_강원교육현옥샘_TTF.ttf");
+}
+
+.font {
+    font-size: 48px;
+    align-items: center;
+    font-family: "chatfont";
+    text-shadow: 0 2px 1px rgba(220,166,19,100);
+}
+
+.fontsmall{
+    font-size: 30px;
+    font-family: "chatfont";
+}
+
+.fontsmallb{
+    font-size: 20px;
+    font-family: "chatfont";
+}
+.fontsmall25{
+    font-size: 25px;
+    font-family: "chatfont";
+}
+
+.fontbig{
+    font-size: 45px;
+    font-family: "chatfont";
+}
+
+.fontBruno{
+    font-family: "Bruno Ace SC";
+    
+    
+}

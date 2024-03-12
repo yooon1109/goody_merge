@@ -1,0 +1,32 @@
+
+  .radio-container {
+    margin-top: 20px;
+  }
+  
+  .explain-text::placeholder {
+    position: absolute;
+    font-size: 3px;
+    font-weight: bold;
+    margin-top: 5px;
+  }
+  
+  .Check_label {
+    font-size: 13px;
+    font-weight: bold;
+    color: gray;
+  }
+
+  @media (max-width: 390px) {
+    .check {
+      margin-right: 7.75rem;
+    }
+  }
+
+  .css-kk1bwy-MuiButtonBase-root-MuiMenuItem-root.Mui-selected {
+    background-color : lightgray;
+  }
+
+  .css-m5hdmq-MuiInputBase-root-MuiInput-root-MuiSelect-root:after{
+    border-color: black;
+  }
+ 

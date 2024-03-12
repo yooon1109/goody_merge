@@ -1,0 +1,21 @@
+
+.sliding-image {
+  width: 500px;
+  height: 500px;
+  object-fit: cover;
+  transition: transform 0.3s ease-in-out;
+}
+
+.nav_button {
+  color: rgb(0, 0, 0);
+  font-weight: bolder;
+  border: none;
+  border-radius: 20%;
+  padding: 5px 10px;
+}
+
+
+.yellow {
+  background-color: #FFD52B; /* Use your theme's secondary color here */
+  color: white; /* Adjust text color for readability */
+}
