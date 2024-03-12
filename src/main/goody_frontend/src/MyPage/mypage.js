@@ -11,9 +11,6 @@ import { Avatar as AntAvatar } from 'antd';
 const { Meta } = Card;
 
 
-
-
-
 const AvatarComponent = ({ profileImg }) => {
   const [avatarStyle, setAvatarStyle] = useState({
     backgroundSize: 'cover',
