@@ -1,0 +1,44 @@
+
+.transition-enter {
+  transform: scaleX(0); /* X축 방향으로 0 배율로 축소하여 안 보이도록 설정 */
+  transform-origin: center; /* 변환의 기준점을 가운데로 설정 */
+}
+
+.transition-enter-active {
+  transform: scaleX(1); /* X축 방향으로 1 배율로 확대하여 보이도록 설정 */
+  transition: transform 300ms ease-in-out; /* 변화에 transition 효과 추가 */
+}
+
+.transition-exit {
+  transform: scaleX(1); /* X축 방향으로 1 배율로 확대한 상태로 시작 */
+  transform-origin: center;
+  transition: transform 300ms ease-in-out; /* 변환의 기준점을 가운데로 설정 */
+}
+
+.transition-exit-active {
+  transform: scaleX(1); /* X축 방향으로 0 배율로 축소하여 사라지도록 설정 */
+  transition: transform 300ms ease-in-out; /* 변화에 transition 효과 추가 */
+}
+
+
+
+.mount{ animation: 0.6s ease-in-out loadEffect3; }
+
+@keyframes loadEffect3 {
+    0%{
+        opacity: 0;
+        transform: scale(0.7);
+    }
+    65%{
+        opacity: 0.65;
+        transform: scale(1.01);
+    }
+    85%{
+        opacity: 0.85;
+        transform: scale(0.97);
+    }
+    100%{
+        opacity: 1;
+        transform: scale(1);
+    }
+  }

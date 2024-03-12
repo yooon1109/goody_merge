@@ -1,0 +1,15 @@
+.fa-heart-regular {
+    color: #b4b4b4; /* 클릭 전 아이콘 색상 */
+}
+
+.text-color {
+    color: #FFD52B !important; /* 클릭 후 아이콘 색상 */
+}
+
+  
+  .text-overflow {
+    white-space: nowrap;        /* 공백문자를 처리하지 않고 줄 바꿈 방지 */
+    overflow: hidden;           /* 내용이 상자 영역을 넘어갈 때 숨김 처리 */
+    text-overflow: ellipsis;    /* 내용이 숨겨질 때 마침표(...) 표시 */
+    max-width: 100px;           /* 최대 너비를 설정 (원하는 크기로 조절) */
+  }

@@ -1,0 +1,7 @@
+.carousel.carousel-slider .control-arrow {
+    display: none;
+  }
+
+  .sliding {
+    transition: margin-top 0.5s ease; 
+  }
