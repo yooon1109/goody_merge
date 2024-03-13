@@ -42,7 +42,7 @@ public class SecurityConfig{
              .headers(f->f.frameOptions(frameOptionsConfig -> frameOptionsConfig.sameOrigin()))
              .sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
              .authorizeHttpRequests((request) -> request
-                 .requestMatchers("/user/**","/v3/api-docs/**",
+                 .requestMatchers("/**","/user/**","/v3/api-docs/**",
                      "/swagger-ui/**","/ws-stomp/**").permitAll()//해당경로 url은 인증없이 사용가능
                  .anyRequest().authenticated())
              .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),

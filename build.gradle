@@ -59,8 +59,7 @@ def frontendDir = "$projectDir/src/main/goody_frontend"
 
 sourceSets {
     main {
-        resources { srcDirs = ["$projectDir/src/main/resources"]
-        }
+        resources { srcDirs = ["$projectDir/src/main/resources"] }
     }
 }
 
@@ -71,10 +70,9 @@ tasks.register('installReact', Exec) {
     inputs.dir "$frontendDir"
     group = BasePlugin.BUILD_GROUP
     if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-        commandLine "npm.cmd", "audit", "fix"
-        commandLine 'npm.cmd', 'install'
+        commandLine "npm.cmd", "install"
     } else {
-        commandLine "npm", "audit", "fix" commandLine 'npm', 'install'
+        commandLine "npm", "install"
     }
 }
 
@@ -88,6 +86,22 @@ tasks.register('buildReact', Exec) {
     } else {
         commandLine "npm", "run-script", "build"
     }
+}
+
+tasks.register('startReact', Exec) {
+    dependsOn "buildReact"
+    workingDir "$frontendDir"
+    inputs.dir "$frontendDir"
+    group = BasePlugin.BUILD_GROUP
+    if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+        commandLine "npm.cmd", "start"
+    } else {
+        commandLine "npm", "start"
+    }
+}
+
+tasks.named('bootRun').configure {
+    dependsOn "startReact"
 }
 
 tasks.register('copyReactBuildFiles', Copy) {
